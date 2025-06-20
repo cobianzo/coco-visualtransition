@@ -63,8 +63,9 @@ final class Coco_Visual_Transition {
 	 * @return void
 	 */
 	private function init() {
-		add_action( 'plugins_loaded', array( $this, 'load_textdomain' ) );
-		// Add more initialization code here.
+		add_action( 'plugins_loaded', [ $this, 'load_textdomain' ] );
+
+		add_action( 'enqueue_block_editor_assets', [ $this, 'enqueue_scripts' ] );
 	}
 
 	/**
@@ -78,6 +79,32 @@ final class Coco_Visual_Transition {
 			'coco-visualtransition',
 			false,
 			dirname( plugin_basename( __FILE__ ) ) . '/languages'
+		);
+	}
+
+	/**
+	 * Enqueue frontend scripts and styles
+	 *
+	 * @return void
+	 */
+	public function enqueue_scripts() {
+
+		$asset_file = include COCO_VT_PLUGIN_DIR . 'build/index.asset.php';
+
+		wp_enqueue_script(
+			'coco-visualtransition',
+			plugins_url( 'build/index.js', __FILE__ ),
+			$asset_file['dependencies'],
+			$asset_file['version'],
+			true
+		);
+
+		wp_localize_script(
+			'coco-visualtransition',
+			'cocoData',
+			[
+				'ajaxurl' => admin_url( 'admin-ajax.php' ),
+			]
 		);
 	}
 }

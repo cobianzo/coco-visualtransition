@@ -5,6 +5,8 @@
   "scripts": {
     "up": "wp-env start && npm run wordpress:install",
     "down": "wp-env stop",
+    "build": "wp-scripts build",
+    "start": "wp-scripts start",
     "cli": "wp-env run cli",
     "bash": "npm run cli bash",
     "tcli": "wp-env run tests-cli",
@@ -28,5 +30,8 @@
     "@wordpress/env": "^10.2.0",
     "@wordpress/scripts": "^26.0.0",
     "archiver": "^7.0.1"
+  },
+  "dependencies": {
+    "ajv": "^8.17.1"
   }
 }
