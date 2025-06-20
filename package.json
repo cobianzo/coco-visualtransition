@@ -1,6 +1,6 @@
 {
   "name": "coco-visualtransition",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Plugin para scraping de carteleras",
   "scripts": {
     "up": "wp-env start && npm run wordpress:install",

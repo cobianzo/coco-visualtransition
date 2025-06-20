@@ -29,9 +29,13 @@ const FILES = {
  */
 function updateFileVersion(filePath, currentVersion, newVersion, silent = false) {
 	const content = fs.readFileSync(filePath, 'utf-8');
-	const updatedContent = content.replace(currentVersion, newVersion, { flags: 'i' });
+	const updatedContent = content.replaceAll(currentVersion, newVersion);
 	fs.writeFileSync(filePath, updatedContent, 'utf-8');
-	if (!silent) console.log(`Updated version in ${filePath}`);
+	if (!silent) {
+		const matches = content.match(new RegExp(currentVersion, 'gi'));
+		const count = matches ? matches.length : 0;
+		console.log(`Updated ${count} occurrence${count !== 1 ? 's' : ''} of version in ${filePath}`);
+	}
 }
 
 /**

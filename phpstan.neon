@@ -1,13 +1,13 @@
+# phpstan.neon
 parameters:
-  level: 5
-  paths:
-    - coco-visualtransition.php
-    - inc/
-  ignoreErrors:
-    # Here the rules I want to ignore...
-  bootstrapFiles:
-    - phpstan-bootstrap.php
+    level: 5
+    paths:
+        - inc
 
-includes:
-  # no need to include it because we use composer.
-  # - vendor/szepeviktor/phpstan-wordpress/extension.neon
+    excludePaths:
+        - */tests/*
+        - */vendor/*
+        - */node_modules/*
+
+    inferPrivatePropertyTypeFromConstructor: true
+    reportUnmatchedIgnoredErrors: false
