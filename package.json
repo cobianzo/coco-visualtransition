@@ -1,0 +1,32 @@
+{
+  "name": "coco-visualtransition",
+  "version": "1.0.1",
+  "description": "Plugin para scraping de carteleras",
+  "scripts": {
+    "up": "wp-env start && npm run wordpress:install",
+    "down": "wp-env stop",
+    "cli": "wp-env run cli",
+    "bash": "npm run cli bash",
+    "tcli": "wp-env run tests-cli",
+    "tbash": "npm run tcli bash",
+    "test:php": "wp-env run tests-wordpress --env-cwd='wp-content/plugins/coco-visualtransition' composer run punit",
+    "test:php:watch": "wp-env run tests-wordpress --env-cwd='wp-content/plugins/coco-visualtransition' composer run punit-watch",
+    "test:php:e2e": "npm run test:php tests/E2ETest.php",
+    "wpcli": "wp-env run cli wp ",
+    "db:options": "npm run wpcli db query \"SELECT option_name FROM wp_options WHERE option_name LIKE '%coco_%';\"",
+    "cs": "composer run lint .",
+    "cbf": "composer run format .",
+    "version": "node ./bin/version-increment.js",
+    "plugin-build": "node ./bin/build-plugin.js",
+    "import-db": "sh ./bin/import-db.sh",
+    "export-db": "sh ./bin/export-db.sh",
+    "wordpress:install": "wp-env run cli wp core download --path=wordpress"
+  },
+  "author": "@cobianzo",
+  "license": "GPL-2.0-or-later",
+  "devDependencies": {
+    "@wordpress/env": "^10.2.0",
+    "@wordpress/scripts": "^26.0.0",
+    "archiver": "^7.0.1"
+  }
+}

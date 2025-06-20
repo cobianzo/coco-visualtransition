@@ -1,0 +1,59 @@
+{
+  "name": "coco/visualtransition",
+  "description": "WP Plugin which creates a visual transition between vertical blocks",
+  "version": "1.0.1",
+  "type": "wordpress-plugin",
+  "license": "GPL-2.0-or-later",
+  "autoload": {
+    "psr-4": {
+      "CarteleraScrap\\": "src/"
+    }
+  },
+  "authors": [
+    {
+      "name": "Cobianzo",
+      "email": "cobianzo@gmail.com"
+    }
+  ],
+  "minimum-stability": "stable",
+  "require": {
+    "php": ">=8.1"
+  },
+  "require-dev": {
+    "squizlabs/php_codesniffer": "^3.7",
+    "wp-coding-standards/wpcs": "^3.0",
+    "dealerdirect/phpcodesniffer-composer-installer": "^1.0",
+    "automattic/vipwpcs": "^3.0",
+    "alleyinteractive/alley-coding-standards": "^2.2",
+    "phpstan/phpstan": "^2.1",
+    "szepeviktor/phpstan-wordpress": "^2.0",
+    "phpstan/extension-installer": "^1.4",
+    "phpunit/phpunit": "^9.6",
+    "yoast/phpunit-polyfills": "^1.0 || ^2.0 || ^4.0",
+    "spatie/phpunit-watcher": "^1.24"
+  },
+  "config": {
+    "allow-plugins": {
+      "dealerdirect/phpcodesniffer-composer-installer": true,
+      "phpstan/extension-installer": true,
+      "johnpbloch/wordpress-core-installer": true
+    }
+  },
+  "scripts": {
+    "lint": "./vendor/bin/phpcs --standard=phpcs.xml.dist",
+    "format": "./vendor/bin/phpcbf --standard=phpcs.xml.dist",
+    "analyze": "./vendor/bin/phpstan analyze --memory-limit=512M",
+		"phpcs-clear": [
+			"rm -rf ~/.composer/cache",
+			"rm -rf ~/.config/composer/cache",
+      "find ./.phpcs -mindepth 1 ! -name '.gitkeep' -delete"
+		],
+    "punit": "phpunit",
+    "punit-watch": "IS_WATCHING=true phpunit-watcher watch < /dev/tty",
+    "test": [
+      "@phpcs",
+      "@phpstan",
+      "@phpunit"
+    ]
+  }
+}

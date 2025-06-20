@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<phpunit bootstrap="tests/bootstrap.php"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/10.5/phpunit.xsd"
+  backupGlobals="false"
+  colors="true"
+	stopOnFailure="false"
+  cacheDirectory=".phpunit.result.cache"
+>
+  <testsuites>
+    <testsuite name="Basic Tests of the plugin">
+      <directory suffix="Test.php">tests/</directory>
+    </testsuite>
+		<testsuite name="TextAnalysis">
+			<directory prefix="Text" suffix="Test.php">tests/</directory>
+		</testsuite>
+		<testsuite name="ScrapAnalysis">
+			<directory prefix="Scrap" suffix="Test.php">tests/</directory>
+		</testsuite>
+		<testsuite name="Single">
+			<file>tests/TextAnalyzeTest.php</file>
+		</testsuite>
+
+		<testsuite name="SingleE2E">
+			<directory prefix="E2E" suffix="Test.php">tests/</directory>
+		</testsuite>
+  </testsuites>
+</phpunit>
