@@ -30,7 +30,8 @@
     "phpstan/extension-installer": "^1.4",
     "phpunit/phpunit": "^9.6",
     "yoast/phpunit-polyfills": "^1.0 || ^2.0 || ^4.0",
-    "spatie/phpunit-watcher": "^1.24"
+    "spatie/phpunit-watcher": "^1.24",
+    "php-stubs/wordpress-stubs": "^6.8"
   },
   "config": {
     "allow-plugins": {
@@ -42,7 +43,7 @@
   "scripts": {
     "lint": "./vendor/bin/phpcs --standard=phpcs.xml.dist",
     "format": "./vendor/bin/phpcbf --standard=phpcs.xml.dist",
-    "analyze": "./vendor/bin/phpstan analyze --memory-limit=512M --level=max --verbose --debug",
+    "analyze": "./vendor/bin/phpstan analyze --memory-limit=512M --verbose --debug",
 		"phpcs-clear": [
 			"rm -rf ~/.composer/cache",
 			"rm -rf ~/.config/composer/cache",
