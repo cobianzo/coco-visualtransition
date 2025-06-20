@@ -29,13 +29,21 @@ const FILES = {
  */
 function updateFileVersion(filePath, currentVersion, newVersion, silent = false) {
 	const content = fs.readFileSync(filePath, 'utf-8');
-	const updatedContent = content.replaceAll(currentVersion, newVersion);
+  let updatedContent = '--error--';
+  // in the entry php file there are two occurrences of the version, so we check for all of them.
+  if (filePath == FILES.pluginPHP) {
+    updatedContent = content.replaceAll(currentVersion, newVersion);
+    if (!silent) {
+      const matches = content.match(new RegExp(currentVersion, 'gi'));
+      const count = matches ? matches.length : 0;
+      console.log(`Updated ${count} occurrence${count !== 1 ? 's' : ''} of version in ${filePath}`);
+    }
+  } else {
+    // in the package, plugin.txt and composer, we only replace the first occurrence of the version.
+    updatedContent = content.replace(currentVersion, newVersion, { flags: 'i' });
+    if (!silent) console.log(`Updated version in ${filePath}`);
+  }
 	fs.writeFileSync(filePath, updatedContent, 'utf-8');
-	if (!silent) {
-		const matches = content.match(new RegExp(currentVersion, 'gi'));
-		const count = matches ? matches.length : 0;
-		console.log(`Updated ${count} occurrence${count !== 1 ? 's' : ''} of version in ${filePath}`);
-	}
 }
 
 /**

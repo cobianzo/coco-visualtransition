@@ -31,12 +31,5 @@ Other keywords:
 ```
 coco-visualtransition.php
 inc/ my php files.
-src/ my js files.
+src/ my ts files which compile into /build/
 ```
-
-STEP 1
-===
-I want to setup the environment for having the pluging comiling my ts files. Let's start by making my plugin having
-src/coco-visualtransition.ts
-with a simple alert(), which will be loaded in the editor when editing a page with gutenberg.
-

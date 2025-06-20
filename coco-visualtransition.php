@@ -3,7 +3,7 @@
  * Plugin Name: Coco Visual Transition
  * Plugin URI: https://cobianzo.com/plugins/coco-visualtransition/
  * Description: A plugin for visual transitions
- * Version: 1.0.2
+ * Version: 1.0.3
  * Author: cobianzo
  * Author URI: https://cobianzo.com
  * License: GPL-2.0-or-later
@@ -22,7 +22,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Define plugin constants
  */
-define( 'COCO_VT_VERSION', '1.0.2' );
+define( 'COCO_VT_VERSION', '1.0.3' );
 define( 'COCO_VT_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'COCO_VT_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 

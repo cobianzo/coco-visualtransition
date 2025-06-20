@@ -1,5 +1,5 @@
 > TODO: since this is not a commertial plugin, it's not really needed
 
-Version: 1.0.2
+Version: 1.0.3
 
 Nothing else.

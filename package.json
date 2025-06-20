@@ -1,6 +1,6 @@
 {
   "name": "coco-visualtransition",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Plugin para scraping de carteleras",
   "scripts": {
     "up": "wp-env start && npm run wordpress:install",
@@ -27,11 +27,18 @@
   "author": "@cobianzo",
   "license": "GPL-2.0-or-later",
   "devDependencies": {
+    "@types/wordpress__blocks": "^12.5.17",
     "@wordpress/env": "^10.2.0",
     "@wordpress/scripts": "^26.0.0",
     "archiver": "^7.0.1"
   },
   "dependencies": {
-    "ajv": "^8.17.1"
+    "@wordpress/block-editor": "^14.20.0",
+    "@wordpress/blocks": "^14.14.0",
+    "@wordpress/components": "^29.11.0",
+    "@wordpress/element": "^6.25.0",
+    "@wordpress/hooks": "^4.25.0",
+    "ajv": "^8.17.1",
+    "lodash": "^4.17.21"
   }
 }

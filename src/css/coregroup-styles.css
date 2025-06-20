@@ -1,0 +1,10 @@
+/* Frontend */
+.wp-block-group {
+
+  .coco-has-visualtransition,
+  &.coco-has-visualtransition {
+    outline: 5px dashed #000;
+  }
+}
+
+@import url('./pattern-triangles.css');

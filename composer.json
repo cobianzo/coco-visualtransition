@@ -1,7 +1,7 @@
 {
   "name": "coco/visualtransition",
   "description": "WP Plugin which creates a visual transition between vertical blocks",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "type": "wordpress-plugin",
   "license": "GPL-2.0-or-later",
   "autoload": {
@@ -42,7 +42,7 @@
   "scripts": {
     "lint": "./vendor/bin/phpcs --standard=phpcs.xml.dist",
     "format": "./vendor/bin/phpcbf --standard=phpcs.xml.dist",
-    "analyze": "./vendor/bin/phpstan analyze --memory-limit=512M",
+    "analyze": "./vendor/bin/phpstan analyze --memory-limit=512M --level=max --verbose --debug",
 		"phpcs-clear": [
 			"rm -rf ~/.composer/cache",
 			"rm -rf ~/.config/composer/cache",
