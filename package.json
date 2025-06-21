@@ -2,6 +2,7 @@
   "name": "coco-visualtransition",
   "version": "1.0.3",
   "description": "Plugin para scraping de carteleras",
+  "type": "module",
   "scripts": {
     "up": "wp-env start && npm run wordpress:install",
     "down": "wp-env stop",
@@ -22,15 +23,29 @@
     "plugin-build": "node ./bin/build-plugin.js",
     "import-db": "sh ./bin/import-db.sh",
     "export-db": "sh ./bin/export-db.sh",
-    "wordpress:install": "wp-env run cli wp core download --path=wordpress"
+    "wordpress:install": "wp-env run cli wp core download --path=wordpress",
+    "lint": "eslint src/",
+    "lint:fix": "eslint src/ --ext js,ts,tsx --fix"
   },
   "author": "@cobianzo",
   "license": "GPL-2.0-or-later",
   "devDependencies": {
+    "@eslint/js": "^9.29.0",
     "@types/wordpress__blocks": "^12.5.17",
+    "@typescript-eslint/eslint-plugin": "^6.21.0",
+    "@typescript-eslint/parser": "^6.21.0",
     "@wordpress/env": "^10.2.0",
+    "@wordpress/eslint-plugin": "^22.11.0",
     "@wordpress/scripts": "^26.0.0",
-    "archiver": "^7.0.1"
+    "archiver": "^7.0.1",
+    "eslint": "^9.29.0",
+    "eslint-config-prettier": "^10.1.5",
+    "eslint-plugin-prettier": "^5.5.0",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "prettier": "^3.5.3",
+    "typescript": "^5.8.3",
+    "typescript-eslint": "^8.34.1"
   },
   "dependencies": {
     "@wordpress/block-editor": "^14.20.0",

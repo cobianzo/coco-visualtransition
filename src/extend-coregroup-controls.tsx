@@ -12,9 +12,16 @@ import { __ } from "@wordpress/i18n";
 // Internal dependencies
 import patterns from './patterns.json';
 
+// Types
+import { BlockEditProps } from "@wordpress/block-editor";
+interface CustomAttributes {
+	visualTransitionName?: string;
+}
+
 // Crear componente HOC para extender el panel de Inspector
 const newCoreBlock = createHigherOrderComponent(
-	(BlockEdit: any) => (props: any) => {
+	(BlockEdit: BlockEditProps<CustomAttributes>) =>
+		(props: BlockEditProps<CustomAttributes>) => {
 
 		if (props.name !== "core/group") {
 			return <BlockEdit {...props} />;

@@ -1,4 +1,12 @@
 {
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll": true
+  },
+  "eslint.validate": ["javascript", "typescript"],
+  "eslint.alwaysShowStatus": true,
+  "prettier.requireConfig": true,
+
   "phpcs.composerJsonPath": "composer.json",
   "phpcs.executablePath": "vendor/bin/phpcs",
   "phpcs.lintOnOpen": false,

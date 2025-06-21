@@ -1,5 +1,5 @@
 import { addFilter } from '@wordpress/hooks';
-import { BlockAttributes, BlockEditProps } from '@wordpress/blocks';
+import { BlockAttributes } from '@wordpress/blocks';
 
 /**
  * Adds the classes for the core/group block.
@@ -8,7 +8,7 @@ import { BlockAttributes, BlockEditProps } from '@wordpress/blocks';
 
 interface ExtraProps {
 	className?: string;
-	[key: string]: any;
+	[key: string]: string | undefined;
 }
 
 const newClassesForCoreGroup = (
