@@ -64,7 +64,7 @@ const newCoreBlock = createHigherOrderComponent(
 							<SelectControl
 								label={__("Select Transition Effect", "coco-visualtransition")}
 								value={visualTransitionName}
-								options={ [ { 'label': '---', value: '' },  ...patterns]}
+								options={ [ { 'label': '---', value: '' },  ...patterns.map( ( pattern ) => ( { 'label': pattern.label, value: pattern.value } ))]}
 								onChange={(value: string) =>
 									setAttributes({ visualTransitionName: value })
 								}

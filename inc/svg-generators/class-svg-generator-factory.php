@@ -23,11 +23,11 @@ class SVG_Generator_Factory {
 
 		switch ( $pattern ) {
 			case 'triangles':
-				return new Triangles_SVG( $id, $atts );
+				return new Triangles_SVG( $pattern, $id, $atts );
 			case 'squares':
-				return new Squares_SVG( $id, $atts );
+				return new Squares_SVG( $pattern, $id, $atts );
 			case 'waves':
-				return new Waves_SVG( $id, $atts );
+				return new Waves_SVG( $pattern, $id, $atts );
 			default:
 				throw new \Exception( "Invalid SVG generator type: {$type}" );
 		}

@@ -5,7 +5,9 @@
   },
   {
     "label": "Squares",
-    "value": "squares"
+    "value": "squares",
+    "pattern": "0 0, {x_size} 0, {x_size} {y_size}, 0 {y_size}",
+    "patternRepeat": "repeat-x"
   },
   {
     "label": "Triangles",
