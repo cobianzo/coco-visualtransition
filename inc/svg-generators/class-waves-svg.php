@@ -7,7 +7,6 @@
 
 namespace Coco\VisualTransition;
 
-use SVG_Generator;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
@@ -27,9 +26,6 @@ class Waves_SVG extends SVG_Generator {
 
 	public function generate_SVG( $p = '' ): string {
 
-		if ( $p ) {
-			return parent::generate_SVG( $p );
-		}
 
 		/*
 		PATTERN WAVES, created programmatically as a path.

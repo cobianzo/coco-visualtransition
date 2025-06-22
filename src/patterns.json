@@ -6,11 +6,13 @@
   {
     "label": "Squares",
     "value": "squares",
-    "pattern": "0 0, {x_size} 0, {x_size} {y_size}, 0 {y_size}",
+    "pattern": "{x_size} 0, {x_size} {y_size}, {2*x_size} {y_size}, {2*x_size} 0",
     "patternRepeat": "repeat-x"
   },
   {
     "label": "Triangles",
-    "value": "triangles"
+    "value": "triangles",
+    "pattern": "{x_size} {y_size}, {2*x_size} 0",
+    "patternRepeat": "repeat-x"
   }
 ]

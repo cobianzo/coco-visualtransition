@@ -33,5 +33,41 @@ class GenerateSVGTest extends WP_UnitTestCase
 		$points = "10 20, 30 40, 50 60";
 		$result = $svg_generator->get_last_x_point($points);
 		$this->assertEquals(50, $result, 'Should return x value of last point');
+
+		// Test case 3: Decimals and spaces bothering
+		$points = "  0.01 0.4,   0.30 0.040,   0.50 0.460";
+		$result = $svg_generator->get_last_x_point($points);
+
+		$this->assertEquals(0.5, $result, 'Should return 0.50 value of last point');
 	}
+
+
+/**
+ * Test generate_points_string_from_pattern method
+ */
+public function test_generate_points_string_from_pattern()
+{
+    // Create an instance of SVG_Generator
+    $svg_generator = new SVG_Generator('', '', []);
+
+    // // Test case 1: Simple pattern with single figure
+    $pattern = "{x_size} {y_size}";
+    $result = $svg_generator->generate_points_string_from_pattern($pattern, 1, 0.5, 0, 0);
+    $this->assertEquals("0 0, 1 0.5, 1 1, 0 1Z", $result, 'Should generate correct points for single figure');
+
+    // // Test case 2: Pattern with multiple figures
+    $pattern = "{x_size} {y_size}, {2*x_size} 0";
+    $result = $svg_generator->generate_points_string_from_pattern($pattern, 2, 0.5, 0, 0);
+    $this->assertEquals("0 0, 0.5 0.5, 1 0, 1.5 0.5, 2 0, 1 1, 0 1Z", $result, 'Should generate correct points for multiple figures');
+
+    // Test case 3: Pattern with 2*x_size placeholder
+    $pattern = "{x_size} 0, {x_size} {y_size}, {2*x_size} {y_size}, {2*x_size} 0";
+    $result = $svg_generator->generate_points_string_from_pattern($pattern, 1, 0.5, 0, 0);
+    $this->assertEquals("0 0, 1 0, 1 0.5, 2 0.5, 2 0, 1 1, 0 1Z", $result, 'Should handle 2*x_size placeholder correctly');
+
+    // Test case 4: Pattern with offsets
+    $pattern = "{x_size} 0, {x_size} {y_size}";
+    $result = $svg_generator->generate_points_string_from_pattern($pattern, 1, 0.5, 0.1, 0.1);
+    $this->assertEquals("-0.1 0, 1.1 0, 1.1 0.5, 1.1 1.1, -0.1 1.1Z", $result, 'Should handle offsets correctly');
+}
 }

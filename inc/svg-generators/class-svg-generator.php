@@ -11,7 +11,7 @@ namespace Coco\VisualTransition;
 class SVG_Generator {
 
 	public $id;
-	public $pattern_height = '50px';
+	public $pattern_height = '0.05';
 	public $number_figures = '10';
 
 	protected $pattern_data;
@@ -24,7 +24,7 @@ class SVG_Generator {
 	public $points_string = '';
 	public $svg_string    = '';
 
-	function __construct( string $pattern_name, string $id, $atts = [] ) {
+	function __construct( string $pattern_name = '', string $id = 'mi-greca', $atts = [] ) {
 
 		$this->id = $id;
 
@@ -36,22 +36,29 @@ class SVG_Generator {
 			$this->number_figures = $atts['number-figures'];
 		}
 
-		// loads the pattern single
-		$plugin_root       = plugin_dir_path( dirname( dirname( __FILE__ ) ) );
-		$patterns_filename = $plugin_root . '/src/patterns.json';
-		$patterns_json     = json_decode(file_get_contents($patterns_filename), true);
-		$this->pattern_data = array_find( $patterns_json, fn( $pattern_data ) => $pattern_name === $pattern_data['value'] );
+		if ( ! empty( $pattern_name ) ) {
 
-		// print_r( $this->pattern_data ); todelete
+			// loads the pattern single
+			$plugin_root        = plugin_dir_path( dirname( __DIR__ ) );
+			$patterns_filename  = $plugin_root . '/src/patterns.json';
+			$patterns_json      = json_decode( file_get_contents( $patterns_filename ), true );
+			$this->pattern_data = array_find( $patterns_json, fn( $pattern_data ) => $pattern_name === $pattern_data['value'] );
 
-		if ( ! empty( $this->pattern_data['patternRepeat'] ) && 'repeat-x' === $this->pattern_data['patternRepeat'] ) {
-			$this->points_string = $this->pattern_data['pattern'];
+			// print_r( $this->pattern_data ); todelete
+
+			if ( ! empty( $this->pattern_data['patternRepeat'] ) && 'repeat-x' === $this->pattern_data['patternRepeat'] ) {
+				// prepare the pattern for single figure using
+
+
+				// calculate boundaies of the the clip mask, we'll use it in the child.
+				$this->start_point_x = 0 - $this->offset_x;
+				$this->end_point_x   = 1 + $this->offset_x;
+				$this->end_point_y   = 1 + $this->offset_y;
+
+				// now we loop the pattern moving right until getting the 100% (end_point_x).
+				$this->points_string = self::generate_points_string_from_pattern( $this->pattern_data['pattern'], $this->number_figures, $this->pattern_height, 0.1, 0.1 );
+			}
 		}
-
-		// calculate boundaies of the the clip mask, we'll use it in the child.
-		$this->start_point_x = 0 - $this->offset_x;
-		$this->end_point_x   = 1 + $this->offset_x;
-		$this->end_point_y   = 1 + $this->offset_y;
 	}
 
 	/**
@@ -60,7 +67,7 @@ class SVG_Generator {
 	 * @return string The generated SVG markup
 	 */
 	public function generate_SVG(): string {
-		$points = $this->points_string ?? '';
+		$points           = $this->points_string ?? '';
 		$this->svg_string = <<<SVG
 <svg width="0" height="0">
 	<defs>
@@ -84,16 +91,68 @@ SVG;
 	 *
 	 * @return void
 	 */
-	public function get_last_x_point( ?string $overwrite_points ): int {
-		$string_points = $overwrite_points?? $this->points_string;
+	public function get_last_x_point( ?string $overwrite_points ): float {
+		$string_points = $overwrite_points ?? $this->points_string;
 
 		$points     = explode( ',', trim( $string_points ) );
 		$last_point = trim( end( $points ) );
+		$last_point = preg_replace( '/\s+/', ' ', trim( $last_point ) );
+
 
 		$last_x = explode( ' ', $last_point )[0];
-		$last_x = intval( $last_x );
+		$last_x = floatval( $last_x );
 
 		return $last_x;
 	}
 
+	/**
+	 * from a given pattern string, using the placeholders for the gap of the x and y coords,
+	 * we repeat the pattern a number of times. Example of pattern: "0 0, {x_size} 0, {x_size} {y_size}, {2*x_size} {y_size}"
+	 * Will return something like: "0 0, 0.25 0, 0.25 0.05, 0.5 0.05, "
+	 *
+	 * @param string  $pattern
+	 * @param integer $number_figures
+	 * @param float   $pattern_height
+	 * @param float   $offset_x
+	 * @param float   $offset_y
+	 * @return string
+	 */
+	public static function generate_points_string_from_pattern( string $pattern, int $number_figures, float $pattern_height, float $offset_x = 0, float $offset_y = 0.1 ): string {
+		// prepare the pattern for single figure using
+		// calculate boundaies of the the clip mask, we'll use it in the child.
+		$start_point_x = 0 - $offset_x;
+		$end_point_x   = 1 + $offset_x;
+		$end_point_y   = 1 + $offset_y;
+		// now we loop the pattern moving right until getting the 100% (end_point_x).
+		$current_x     = $start_point_x;
+		$points_string = "$start_point_x 0";
+		$point_x_step  = ( $end_point_x - $start_point_x ) / $number_figures;
+		$pattern_array = explode( ',', trim( $pattern ) );
+		for ( $index = 0; $index < $number_figures; $index++ ) {
+
+			$latest_x_point = ( new self() )->get_last_x_point( $points_string );
+
+			// we go coordenate by coordenate replacing the placeholders
+			foreach ( $pattern_array as $points ) {
+
+				$points = str_replace( '{x_size}', $point_x_step, $points );
+				$points = str_replace( '{2*x_size}', 2 * $point_x_step, $points );
+				$points = str_replace( '{y_size}', $pattern_height, $points );
+
+				// we run every [x , y]]
+				$x_y = explode( ' ', trim( $points ) );
+				$x   = ( new self() )->get_last_x_point( implode( ' ', $x_y ) );
+				$y   = $x_y[1];
+
+				$x             += $latest_x_point;
+				$points_string .= ", $x $y";
+			}
+		}
+
+		// now points_string follows the pattern at the top of the container. We close it with lines to the bottom right, and bottom left
+		$points_string.= ", $end_point_x $end_point_y, $start_point_x $end_point_y";
+		$points_string.= 'Z';
+
+		return $points_string;
+	}
 }
