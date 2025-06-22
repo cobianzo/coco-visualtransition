@@ -2,6 +2,7 @@ import { addFilter } from '@wordpress/hooks';
 import { BlockAttributes } from '@wordpress/blocks';
 
 /**
+ * Frontend;
  * Adds the classes for the core/group block.
  * Only on the Frontend. The backend class is added with the controls.
  */
@@ -25,6 +26,7 @@ const newClassesForCoreGroup = (
 				+ ` coco-visualtransition-${attributes.visualTransitionName}`;
 		}
 	}
+
 	return extraProps;
 };
 

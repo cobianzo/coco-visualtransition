@@ -1,5 +1,6 @@
-// generic to aboid warnings about missing types
-import React from "react";
+// generic to avoid warnings about missing types
+import * as React from '@wordpress/element';
+import { useState, useEffect } from "@wordpress/element";
 
 // WordPress dependencies
 import { addFilter } from "@wordpress/hooks";
@@ -32,13 +33,20 @@ const newCoreBlock = createHigherOrderComponent(
 		const { visualTransitionName } = attributes;
 
 		// internal state for checkbox
-		const [checkBoxOn, setCheckBoxOn] = React.useState(
+		const [checkBoxOn, setCheckBoxOn] = useState(
 			visualTransitionName !== "",
 		);
 
 		// now the extra classes in the editor depending on the attributes.
-		const customClass = checkBoxOn ? `coco-has-visualtransition coco-visualtransition-${visualTransitionName}` : 'coco-nothing';
-		props.attributes.className = (props.attributes.className || '') + ' ' + customClass;
+		// Only update className if it has changed to avoid unnecessary re-renders
+		useEffect(() => {
+			const customClass = checkBoxOn ? `coco-has-visualtransition coco-visualtransition-${visualTransitionName}` : 'coco-nothing';
+			const newClassName = `${props.attributes.className || ''} ${customClass}`.trim();
+
+			if (props.attributes.className !== newClassName) {
+				props.attributes.className = newClassName;
+			}
+		}, [props.attributes, checkBoxOn, visualTransitionName]);
 
 		return (
 			<Fragment>

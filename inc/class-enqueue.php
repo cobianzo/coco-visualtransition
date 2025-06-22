@@ -85,12 +85,12 @@ class Enqueue {
 			// Check if the pattern is used in the post content.
 			if ( strpos( $post->post_content, $pattern_name ) !== false ) {
 				// Enqueue the CSS only for the for the pattern.
-				wp_enqueue_style(
-					'coco-visualtransition-' . $pattern_name,
-					plugins_url( "/src/css/pattern-$pattern_name.css", __DIR__ ),
-					[],
-					$asset_file['version']
-				);
+				// wp_enqueue_style(
+				// 'coco-visualtransition-' . $pattern_name,
+				// plugins_url( "/src/css/pattern-$pattern_name.css", __DIR__ ),
+				// [],
+				// $asset_file['version']
+				// );
 			}
 		}
 	}

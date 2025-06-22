@@ -48,6 +48,8 @@ function coco_vt_init() {
 
 	// includes
 	require_once COCO_VT_PLUGIN_DIR . 'inc/class-enqueue.php';
+	require_once COCO_VT_PLUGIN_DIR . 'inc/class-inlinecss.php';
+	require_once COCO_VT_PLUGIN_DIR . 'inc/svg-generators/class-svg-generator.php';
 }
 
 // Initialize the plugin
