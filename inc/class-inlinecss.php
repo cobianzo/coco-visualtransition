@@ -49,7 +49,7 @@ class InlineCSS {
 				1
 			);
 
-			$atts    = [];
+			$atts = [];
 
 			$pattern = $block['attrs']['visualTransitionName'];
 

@@ -23,9 +23,10 @@ class Squares_SVG extends SVG_Generator {
 
 	public function generate_SVG(): string {
 
-		/* PATTERN SQUARES, created programmatically as a path.
+		/*
+		PATTERN SQUARES, created programmatically as a path.
 		================================================
-  			┌───┐   ┌───┐   ┌───┐
+				┌───┐   ┌───┐   ┌───┐
 				│   │   │   │   │   │
 			──┘   └───┘   └───┘   └───
 		*/

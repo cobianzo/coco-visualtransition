@@ -7,7 +7,6 @@
 
 namespace Coco\VisualTransition;
 
-
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
@@ -30,10 +29,11 @@ class Triangles_SVG extends SVG_Generator {
 			return parent::generate_SVG( $p );
 		}
 
-		/* PATTERN TRIANGLES, created programmatically as a path.
+		/*
+		PATTERN TRIANGLES, created programmatically as a path.
 		================================================
 				/\  /\  /\  /\  /\  /\  /\  /\  /\  /\
-			 /  \/  \/  \/  \/  \/  \/  \/  \/  \/  \
+			/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \
 		================================================
 		*/
 
