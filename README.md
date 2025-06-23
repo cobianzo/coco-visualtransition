@@ -1,15 +1,28 @@
 TODO
 ===
 
+- Include frontend inline style and svg to show the result of the visualtransition
+- add the option to move the group up to merge with the previous group.
+- Use masks
+- Include option to load the pattern from a svg file.
 
 - localization
 
 WHAT IS THIS PROJECT
 ===
 
+This plugin is meant to add new attributes and contols to the core block core/group. These attributes allow
+the user to add a visual fret, based on a pattern, to the top of the group container. This fret clips the group container,
+making it "melt" with the previous container.
+
 HOW IT WORKS
 ===
 
+1) Adds the new attributes to the core/block using Gutenberg js.
+2) Depending on the selected pattern, includes inline css for every group having a pattern selected.
+3) The inline css includes a svg with an id, which is associated to the core/group as a mask with clip-path or mark-image.
+4) We use an SVG generator in php, which dyanmicaly generates a svg with the pattern, and includes it in the page.
+We use the development pattern 'factory' for it.
 
 DEVELOPMENT
 ===

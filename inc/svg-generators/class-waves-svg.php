@@ -17,12 +17,32 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class Waves_SVG extends SVG_Generator {
 
-	// props are set up in the constructor.
-
+	/**
+	 * The ID of the SVG element
+	 *
+	 * @var string
+	 */
 	public $id;
+
+	/**
+	 * The height of the wave pattern
+	 *
+	 * @var string
+	 */
 	public $pattern_height = '0.6';
+
+	/**
+	 * The number of wave figures to generate
+	 *
+	 * @var string
+	 */
 	public $number_figures = '10';
 
+	/**
+	 * Generates the points string for the wave SVG path
+	 *
+	 * @return string The SVG path points string
+	 */
 	public function generate_points(): string {
 		$this->points_string = <<<PATH_POINTS
 		M 0,$this->pattern_height

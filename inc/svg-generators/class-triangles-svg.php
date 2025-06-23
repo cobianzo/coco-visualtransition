@@ -14,32 +14,33 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Class Triangle_SVG
  * Handles generation and manipulation of triangle SVG elements
+ *
+ *      PATTERN TRIANGLES, created programmatically as a path.
+ *      ================================================
+ *            /\  /\  /\  /\  /\  /\  /\  /\  /\  /\
+ *           /  \/  \/  \/  \/  \/  \/  \/  \/  \/  \
+ *      ================================================
  */
 class Triangles_SVG extends SVG_Generator {
 
-	// props are set up in the constructor.
-
+	/**
+	 * The unique identifier for this SVG.
+	 *
+	 * @var string
+	 */
 	public $id;
-	public $pattern_height = '0.6';
-	public $number_figures = '10';
 
-	public function generate_SVG( $p = '' ): string {
+	/**
+	 * The height of the pattern relative to viewport.
+	 *
+	 * @var string
+	 */
+	public $pattern_height = '0.1';
 
-		if ( $p ) {
-			return parent::generate_SVG( $p );
-		}
-
-		/*
-		PATTERN TRIANGLES, created programmatically as a path.
-		================================================
-				/\  /\  /\  /\  /\  /\  /\  /\  /\  /\
-			/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \
-		================================================
-		*/
-
-		// calculate the params to draw the points.
-		$svg = parent::generate_SVG();
-
-		return $svg;
-	}
+	/**
+	 * The number of triangle figures to generate.
+	 *
+	 * @var string
+	 */
+	public $number_figures = '3';
 }

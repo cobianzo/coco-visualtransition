@@ -15,7 +15,11 @@ class SVG_Generator_Factory {
 	/**
 	 * Creates and returns an SVG generator instance based on the type
 	 *
-	 * @throws \Exception If invalid generator type is provided
+	 * @param string $pattern The pattern type to generate.
+	 * @param string $id      The unique identifier for the SVG.
+	 * @param array  $atts    Optional attributes for the SVG generator.
+	 * @throws \Exception If invalid generator type is provided.
+	 * @return SVG_Generator Instance of the requested SVG generator.
 	 */
 	public static function create( string $pattern, string $id, $atts = [] ) {
 
@@ -29,7 +33,12 @@ class SVG_Generator_Factory {
 			case 'waves':
 				return new Waves_SVG( $pattern, $id, $atts );
 			default:
-				throw new \Exception( "Invalid SVG generator type: {$type}" );
+				throw new \Exception(
+					sprintf(
+						'Invalid SVG generator type: %s',
+						esc_html( $pattern )
+					)
+				);
 		}
 	}
 

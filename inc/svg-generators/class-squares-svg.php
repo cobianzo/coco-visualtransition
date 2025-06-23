@@ -1,6 +1,6 @@
 <?php
 /**
- * Triangle SVG Class
+ * Square SVG Class
  *
  * @package    VisualTransition
  */
@@ -14,27 +14,32 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Class Triangle_SVG
  * Handles generation and manipulation of triangle SVG elements
+ * PATTERN SQUARES, created programmatically as a path.
+ * ================================================
+ *         ┌───┐   ┌───┐   ┌───┐
+ *         │   │   │   │   │   │
+ *       ──┘   └───┘   └───┘   └───
  */
 class Squares_SVG extends SVG_Generator {
 
+	/**
+	 * The ID of the SVG element
+	 *
+	 * @var string
+	 */
 	public $id;
+
+	/**
+	 * The height of the pattern
+	 *
+	 * @var string
+	 */
 	public $pattern_height = '0.6';
+
+	/**
+	 * The number of figures in the pattern
+	 *
+	 * @var string
+	 */
 	public $number_figures = '5';
-
-	public function generate_SVG(): string {
-
-		/*
-		PATTERN SQUARES, created programmatically as a path.
-		================================================
-				┌───┐   ┌───┐   ┌───┐
-				│   │   │   │   │   │
-			──┘   └───┘   └───┘   └───
-		*/
-
-		// calculate the params to draw the points.
-
-		$svg = parent::generate_SVG();
-
-		return $svg;
-	}
 }
