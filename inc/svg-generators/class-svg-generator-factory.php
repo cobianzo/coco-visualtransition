@@ -15,13 +15,13 @@ class SVG_Generator_Factory {
 	/**
 	 * Creates and returns an SVG generator instance based on the type
 	 *
-	 * @param string $pattern The pattern type to generate.
-	 * @param string $id      The unique identifier for the SVG.
-	 * @param array  $atts    Optional attributes for the SVG generator.
+	 * @param string              $pattern The pattern type to generate.
+	 * @param string              $id      The unique identifier for the SVG.
+	 * @param array<string,mixed> $atts Optional attributes for the SVG generator.
 	 * @throws \Exception If invalid generator type is provided.
 	 * @return SVG_Generator Instance of the requested SVG generator.
 	 */
-	public static function create( string $pattern, string $id, $atts = [] ) {
+	public static function create( string $pattern, string $id, array $atts = [] ) {
 
 		require_once plugin_dir_path( __FILE__ ) . "class-$pattern-svg.php";
 
@@ -45,9 +45,9 @@ class SVG_Generator_Factory {
 	/**
 	 * Gets available generator types
 	 *
-	 * @return array List of available generator types
+	 * @return array<string> List of available generator types
 	 */
-	public static function get_available_types() {
+	public static function get_available_types(): array {
 		return [
 			'triangles',
 			'circles',

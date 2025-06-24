@@ -25,7 +25,8 @@
     "export-db": "sh ./bin/export-db.sh",
     "wordpress:install": "wp-env run cli wp core download --path=wordpress",
     "lint": "eslint src/",
-    "lint:fix": "eslint src/ --ext js,ts,tsx --fix"
+    "lint:fix": "eslint src/ --ext js,ts,tsx --fix",
+    "lint:php": "composer run-script format . && composer run-script lint .  && composer run-script analyze"
   },
   "author": "@cobianzo",
   "license": "GPL-2.0-or-later",

@@ -31,7 +31,7 @@ define( 'COCO_VT_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
  *
  * @return void
  */
-function coco_vt_load_textdomain() {
+function coco_vt_load_textdomain(): void {
 	load_plugin_textdomain(
 		'coco-visualtransition',
 		false,
@@ -41,8 +41,10 @@ function coco_vt_load_textdomain() {
 
 /**
  * Initialize plugin
+ *
+ * @return void
  */
-function coco_vt_init() {
+function coco_vt_init(): void {
 	// quick hooks
 	add_action( 'plugins_loaded', 'coco_vt_load_textdomain' );
 
@@ -54,3 +56,29 @@ function coco_vt_init() {
 
 // Initialize the plugin
 coco_vt_init();
+
+// Debugging functions.
+// phpcs:disable
+/**
+ * Debug function to dump variables
+ *
+ * @param mixed $var Variable to dump
+ * @return void
+ */
+function dd( mixed $var ): void {
+	echo '<pre>';
+	var_dump( $var );
+	echo '</pre>';
+}
+
+/**
+ * Debug function to dump variables and die
+ *
+ * @param mixed $var Variable to dump
+ * @return never
+ */
+function ddie( mixed $var = '' ): never {
+	dd( $var );
+	wp_die();
+}
+// phpcs:enable

@@ -1,7 +1,7 @@
 parameters:
   level: max
   paths:
-    - inc
+    - inc/
 
   excludePaths:
     - */tests/*
