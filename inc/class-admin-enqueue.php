@@ -1,6 +1,7 @@
 <?php
 /**
- * Enqueue class to handle scripts and styles
+ * Enqueue class to handle scripts and styles in the Editor and de
+ * admin area in general.
  *
  * @package CocoVisualTransition
  */
@@ -10,7 +11,7 @@ namespace COCO\VisualTransition;
 /**
  * The class.
  */
-class Enqueue {
+class Admin_Enqueue {
 
 	/**
 	 * Constructor. Call hooks.
@@ -42,6 +43,16 @@ class Enqueue {
 			true
 		);
 
+		// Localize script to expose custom variables to window object
+		wp_localize_script(
+			'coco-visualtransition',
+			'cocoVisualTransition',
+			[
+				'nonce' => wp_create_nonce( 'coco_visual_transition_nonce' ),
+			]
+		);
+
+
 		// The css. editor. Loads all the styles (TODO: inefficient, we showld load them dynamically only when needed).
 		wp_enqueue_style(
 			'coco-visualtransition-group-block-editor',
@@ -52,4 +63,4 @@ class Enqueue {
 	}
 }
 
-Enqueue::init();
+Admin_Enqueue::init();

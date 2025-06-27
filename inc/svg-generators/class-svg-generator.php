@@ -181,7 +181,7 @@ class SVG_Generator {
 		$this->svg_string = <<<SVG
 <svg width="0" height="0">
 	<defs>
-		<clipPath id="$this->id" clipPathUnits="objectBoundingBox">
+		<clipPath id="pattern-$this->id" clipPathUnits="objectBoundingBox">
 			$shape_string
 		</clipPath>
 	</defs>

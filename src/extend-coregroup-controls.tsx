@@ -12,6 +12,7 @@ import { __ } from "@wordpress/i18n";
 
 // Internal dependencies
 import patterns from './patterns.json';
+import { getInlineCssSvg, appendInlineCss, deleteInlineCss } from './add-cssinline-editor';
 
 // Types
 import { BlockEditProps } from "@wordpress/block-editor";
@@ -39,13 +40,20 @@ const newCoreBlock = createHigherOrderComponent(
 
 		// now the extra classes in the editor depending on the attributes.
 		// Only update className if it has changed to avoid unnecessary re-renders
-		useEffect(() => {
-			const customClass = checkBoxOn ? `coco-has-visualtransition coco-visualtransition-${visualTransitionName}` : 'coco-nothing';
-			const newClassName = `${props.attributes.className || ''} ${customClass}`.trim();
+		useEffect( () => {
 
-			if (props.attributes.className !== newClassName) {
-				props.attributes.className = newClassName;
+			console.log('%c TODELETE: we create/update the style for the block', 'font-size:1rem;color:pink', props.clientId, props.attributes)
+
+			const patternName = props.attributes.visualTransitionName;
+			if (checkBoxOn && patternName.length) {
+				getInlineCssSvg(patternName, props.clientId, props.attributes).then( (inlineCSSandSVG) => {
+					appendInlineCss(props.clientId, inlineCSSandSVG);
+				});
+			}else {
+				deleteInlineCss(props.clientId);
 			}
+
+
 		}, [props.attributes, checkBoxOn, visualTransitionName]);
 
 		return (

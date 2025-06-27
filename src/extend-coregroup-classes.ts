@@ -4,7 +4,8 @@ import { BlockAttributes } from '@wordpress/blocks';
 /**
  * Frontend;
  * Adds the classes for the core/group block.
- * Only on the Frontend. The backend class is added with the controls.
+ * Only on the Frontend.
+ * The backend class (in the editor) is added with the controls.
  */
 
 interface ExtraProps {

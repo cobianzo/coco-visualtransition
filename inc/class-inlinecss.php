@@ -30,7 +30,12 @@ final class InlineCSS {
 	 * @return void
 	 */
 	public static function init(): void {
+
+		// For the Frontend.
 		add_filter( 'render_block', [ __CLASS__, 'render_block_with_html_attributes' ], 10, 2 );
+
+		// For the Editor. Rest endpoint handler for generating SVG and CSS on demand.
+		add_action( 'rest_api_init', [ __CLASS__, 'register_rest_route_for_editor_use' ] );
 	}
 
 	/**
@@ -76,9 +81,9 @@ final class InlineCSS {
 	/**
 	 * Generate and insert inline CSS and SVG for visual transitions
 	 *
-	 * @param string                $pattern The pattern name to generate.
+	 * @param string                $pattern The pattern name to generate. ie 'waves'
 	 * @param string                $id Unique identifier for the transition.
-	 * @param array<string, mixed > $atts Additional attributes for the pattern.
+	 * @param array<string, mixed > $atts Additional attributes for the pattern. ie ['pattern-height' => 0.08]
 	 * @return string Generated SVG and CSS styles
 	 */
 	public static function insert_inline_css( string $pattern, string $id, array $atts = [] ): string {
@@ -86,14 +91,89 @@ final class InlineCSS {
 		$generator = SVG_Generator_Factory::create( $pattern, $id, $atts );
 		$svg       = $generator->generate_svg();
 
-		$style = '<style>
+		// The inline css. When used in the editor, we select the div with [data-block], not [data-cocovisualtransitionid]
+		$css = '<style id="coco-vt-' . esc_attr( $id ) . '">
             [data-cocovisualtransitionid="' . $id . '"]{
-                clip-path: url(#' . $id . ');
-                webkit-clip-path: url(#' . $id . ');
+                clip-path: url(#pattern-' . $id . ');
+                webkit-clip-path: url(#pattern-' . $id . ');
             }
-        </style>';
+    </style>';
 
-		return $svg . $style;
+		return $svg . $css;
+	}
+
+	/**
+	 * REST API handler for generating SVG and CSS on demand
+	 * Usage: wp-json/coco/v1/vtstyle/?block_id=unique_id&pattern_name=squares&pattern_atts={"patternHeight":0.08}
+	 *
+	 * @return void
+	 */
+	public static function register_rest_route_for_editor_use(): void {
+
+		register_rest_route( 'coco/v1', '/vtstyle', [
+			'methods'             => 'POST',
+			'allow_non_ssl'       => true, // Allow non-SSL requests for GET method
+			'callback'            => function ( \WP_REST_Request $request ) {
+
+				$params = $request->get_params();
+
+				if ( ! isset( $params['block_id'] ) || ! isset( $params['pattern_name'] ) ) {
+					return new \WP_Error(
+						'missing_params',
+						'Missing required parameters: block_id and pattern_name are required',
+						[ 'status' => 400 ]
+					);
+				}
+
+				/**
+				 * Pattern name from request parameters
+				 *
+				 * @var string $pattern_name
+				 */
+				$pattern_name = $params['pattern_name'];
+
+				/**
+				 * Block identifier from request parameters
+				 *
+				 * @var string $block_id
+				 */
+				$block_id = $params['block_id'];
+
+				/**
+				 * Pattern attributes with height settings
+				 *
+				 * @var array<string, float> $pattern_attrs
+				 */
+				$pattern_attrs = isset( $params['pattern_atts'] ) ? (array) $params['pattern_atts'] : [];
+
+				// Generate SVG and CSS
+				$svg_and_style = self::insert_inline_css(
+					sanitize_text_field( $pattern_name ),
+					sanitize_text_field( $block_id ),
+					$pattern_attrs
+				);
+
+				// change the name of the selector, which is different in the editor than in the FE.
+				$svg_and_style = str_replace( 'data-cocovisualtransitionid', 'data-block', $svg_and_style );
+
+				return $svg_and_style;
+			},
+			'permission_callback' => fn() => current_user_can( 'edit_posts' ),
+			'args'                => [
+				'block_id'     => [
+					'required' => true,
+					'type'     => 'string',
+				],
+				'pattern_name' => [
+					'required' => true,
+					'type'     => 'string',
+				],
+				'pattern_atts' => [
+					'required' => false,
+					'type'     => 'object',
+				],
+			],
+		] );
 	}
 }
 

@@ -49,7 +49,7 @@ function coco_vt_init(): void {
 	add_action( 'plugins_loaded', 'coco_vt_load_textdomain' );
 
 	// includes
-	require_once COCO_VT_PLUGIN_DIR . 'inc/class-enqueue.php';
+	require_once COCO_VT_PLUGIN_DIR . 'inc/class-admin-enqueue.php';
 	require_once COCO_VT_PLUGIN_DIR . 'inc/class-inlinecss.php';
 	require_once COCO_VT_PLUGIN_DIR . 'inc/svg-generators/class-svg-generator.php';
 }
