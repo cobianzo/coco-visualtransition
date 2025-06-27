@@ -44,11 +44,11 @@ class SVG_Generator {
 	public float $pattern_height;
 
 	/**
-	 * Number of pattern figures to generate
+	 * Width of the pattern in relative units
 	 *
-	 * @var int
+	 * @var float
 	 */
-	public int $number_figures;
+	public float $pattern_width;
 
 	/**
 	 * Pattern data loaded from JSON file
@@ -95,9 +95,9 @@ class SVG_Generator {
 		$this->pattern_height = ( isset( $atts['pattern-height'] ) && '' !== $atts['pattern-height'] )
 			? (float) self::to_float( $atts['pattern-height'] ) : 0.1;
 
+		$this->pattern_width = ( isset( $atts['pattern-width'] ) && '' !== $atts['pattern-width'] )
+			? (float) self::to_float( $atts['pattern-width'] ) : 0.1;
 
-		$this->number_figures = ( isset( $atts['number-figures'] ) && '' !== $atts['number-figures'] )
-			? (int) self::to_float( $atts['number-figures'] ) : 10;
 
 
 		$this->generate_points();
@@ -110,12 +110,11 @@ class SVG_Generator {
 	 */
 	public function generate_points(): string {
 		if ( ! empty( $this->pattern_name ) ) {
-			// loads the pattern single
-			$plugin_root       = plugin_dir_path( dirname( __DIR__ ) );
-			$patterns_filename = $plugin_root . '/src/patterns.json';
-			$patterns_json     = wp_json_file_decode( $patterns_filename, [ 'associative' => true ] );
 
-			if ( ! is_array( $patterns_json ) ) {
+			// loads the pattern single
+			$patterns_json = self::load_patterns_json();
+
+			if ( empty( $patterns_json ) ) {
 				return $this->points_string;
 			}
 
@@ -145,7 +144,7 @@ class SVG_Generator {
 					if ( isset( $this->pattern_data['pattern'] ) ) {
 						$this->points_string = self::generate_points_string_from_pattern(
 							$this->pattern_data['pattern'],
-							$this->number_figures,
+							$this->pattern_width,
 							$this->pattern_height,
 							$offset_x,
 							$offset_y
@@ -212,19 +211,38 @@ SVG;
 	}
 
 	/**
+	 * simple helper
+	 *
+	 * @param string $pair_x_y A string containing two numbers separated by space (e.g. "12 3")
+	 * @param 'x'|'y' $coordenate Either 'x' or 'y' coordinate to extract from the pair
+	 * @return float
+	 */
+	public static function get_point_from_pair( string $pair_x_y, string $coordenate = 'x' ): float {
+		$pair_x_y = trim( preg_replace( '/\s+/', ' ', $pair_x_y ) ); // cleanup
+		$x_y      = explode( ' ', $pair_x_y );
+		if ( 'x' === $coordenate ) {
+			return isset( $x_y[0] )? floatval( $x_y[0] ) : 0.0;
+		}
+		if ( 'y' === $coordenate ) {
+			return isset( $x_y[1] )? floatval( $x_y[1] ) : 0.0;
+		}
+		return 0.0;
+	}
+
+	/**
 	 * Helper
 	 * from a given pattern string, using the placeholders for the gap of the x and y coords,
 	 * we repeat the pattern a number of times. Example of pattern: "0 0, {x_size} 0, {x_size} {y_size}, {2*x_size} {y_size}"
 	 * Will return something like: "0 0, 0.25 0, 0.25 0.05, 0.5 0.05, "
 	 *
 	 * @param string $pattern The pattern string containing placeholders for coordinates.
-	 * @param int    $number_figures The number of times to repeat the pattern.
 	 * @param float  $pattern_height The height of each pattern repetition.
+	 * @param float  $pattern_width " " width " "
 	 * @param float  $offset_x The horizontal offset to apply to the pattern.
 	 * @param float  $offset_y The vertical offset to apply to the pattern.
 	 * @return string The generated points string for the SVG shape.
 	 */
-	public static function generate_points_string_from_pattern( string $pattern, int $number_figures, float $pattern_height, float $offset_x = 0, float $offset_y = 0.1 ): string {
+	public static function generate_points_string_from_pattern( string $pattern, float $pattern_width = 0.0, float $pattern_height = 0.0, float $offset_x = 0, float $offset_y = 0.1 ): string {
 		// prepare the pattern for single figure using
 		// calculate boundaies of the the clip mask, we'll use it in the child.
 		$start_point_x = 0 - $offset_x;
@@ -232,32 +250,39 @@ SVG;
 		$end_point_y   = 1 + $offset_y;
 
 		// now we loop the pattern moving right until getting the 100% (end_point_x).
-		$points_string = "$start_point_x 0";
-		$point_x_step  = ( $end_point_x - $start_point_x ) / $number_figures;
+		$points_string  = "$start_point_x 0";
+		$point_x_step   = $pattern_width;
 		$pattern_array = explode( ',', trim( $pattern ) );
 
-		for ( $index = 0; $index < $number_figures; $index++ ) {
+		do {
+
+			// iteration of one figure of the pattern, adapted to the current $latest_x_point.
 			$latest_x_point = ( new self() )->get_last_x_point( $points_string );
 
 			// we go coordenate by coordenate replacing the placeholders
-			foreach ( $pattern_array as $points ) {
+			foreach ( $pattern_array as $points ) { // we evaluate pair of `x, y`. ie `0.4 0.05` or `{x_size} 0`
 				$points = str_replace( '{x_size}', (string) $point_x_step, $points );
 				$points = str_replace( '{2*x_size}', (string) ( 2 * $point_x_step ), $points );
 				$points = str_replace( '{y_size}', (string) $pattern_height, $points );
 
-				// we run every [x , y]]
-				$x_y = explode( ' ', trim( $points ) );
-				$x   = ( new self() )->get_last_x_point( implode( ' ', $x_y ) );
-				$y   = $x_y[1];
+				// we run every `x , y` pair
+				$x   = self::get_point_from_pair( $points, 'x' );
+				$y   = self::get_point_from_pair( $points, 'y' );
 
-				$x             += $latest_x_point;
+				$x              = $x + $latest_x_point;
 				$points_string .= ", $x $y";
 			}
-		}
 
-		// now points_string follows the pattern at the top of the container. We close it with lines to the bottom right, and bottom left
+			$latest_x_point = ( new self() )->get_last_x_point( $points_string );
+
+		} while ( $latest_x_point < $end_point_x );
+
+		$points_string .= sprintf( ', %s %s', $end_point_x, $y ?? 0 );;
+
+		// Close the path! now points_string follows the pattern at the top of the container.
+		// We close it with lines to the bottom right, and bottom left
 		$points_string .= ", $end_point_x $end_point_y, $start_point_x $end_point_y";
-		$points_string .= 'Z';
+		$points_string .= 'Z'; // closes the last point with the first point.
 
 		return $points_string;
 	}
@@ -274,5 +299,12 @@ SVG;
 			return (float) $value;
 		}
 		return $default;
+	}
+
+	public static function load_patterns_json(): array {
+		$plugin_root       = plugin_dir_path( dirname( __DIR__ ) );
+		$patterns_filename = $plugin_root. '/src/patterns.json';
+		$patterns_json     = wp_json_file_decode( $patterns_filename, [ 'associative' => true ] );
+		return $patterns_json ?? [];
 	}
 }

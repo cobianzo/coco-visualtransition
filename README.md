@@ -106,9 +106,6 @@ npm run test:php:watch
 ```
 it uses wp-env run tests-wordpress ...
 
-Following the last PHPUnit installation working version: https://github.com/cobianzo/wp-env-sidebar-related-article/
-PHPUnit 9.4.
-
 Important, we need to use php 8.3 in wp-env, so we can run the package
 `wp-env run tests-wordpress` which works perfectly out of the box.
 

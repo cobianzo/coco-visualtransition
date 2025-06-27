@@ -29,17 +29,4 @@ class Squares_SVG extends SVG_Generator {
 	 */
 	public string $id;
 
-	/**
-	 * The height of the pattern
-	 *
-	 * @var float
-	 */
-	public float $pattern_height;
-
-	/**
-	 * The number of figures in the pattern
-	 *
-	 * @var int
-	 */
-	public int $number_figures;
 }

@@ -43,16 +43,12 @@ class SVG_Generator_Factory {
 	}
 
 	/**
-	 * Gets available generator types
+	 * Gets available generator types in an array. 'trianges;, 'squares'...
 	 *
-	 * @return array<string> List of available generator types
+	 * @return string[] List of available generator types
 	 */
 	public static function get_available_types(): array {
-		return [
-			'triangles',
-			'circles',
-			'squares',
-			'lines',
-		];
+		$patterns_json = SVG_Generator::load_patterns_json();
+		return array_map( fn( $patt ) => $patt['value'], $patterns_json );
 	}
 }

@@ -29,7 +29,7 @@ class Waves_SVG extends SVG_Generator {
 	 *
 	 * @var int
 	 */
-	public int $number_figures = 10;
+	public float $pattern_width = 10;
 
 	/**
 	 * Generates the points string for the wave SVG path

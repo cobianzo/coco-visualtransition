@@ -39,7 +39,7 @@ final class InlineCSS {
 	}
 
 	/**
-	 * Custom render function for group blocks with visual transition
+	 * Frontend: Custom render function for group blocks with visual transition
 	 *
 	 * @param string               $block_content The block content about to be rendered
 	 * @param array<string, mixed> $block The block object, with the attributes and inner blocks.
@@ -64,8 +64,11 @@ final class InlineCSS {
 			);
 
 			$atts = [
-				'pattern-height' => '',
+				'pattern-height' => isset( $block['attrs']['patternHeight'] ) ? (float) $block['attrs']['patternHeight'] : 0.08,
+				'pattern-width'  => isset( $block['attrs']['patternWidth'] ) ? (float) $block['attrs']['patternWidth'] : 0.1,
+				'y-offset'  => isset( $block['attrs']['YOffset'] ) ? (float) $block['attrs']['YOffset'] : 0.0,
 			];
+
 
 			$pattern = is_string( $block['attrs']['visualTransitionName'] )
 				? $block['attrs']['visualTransitionName']
@@ -81,9 +84,9 @@ final class InlineCSS {
 	/**
 	 * Generate and insert inline CSS and SVG for visual transitions
 	 *
-	 * @param string                $pattern The pattern name to generate. ie 'waves'
-	 * @param string                $id Unique identifier for the transition.
-	 * @param array<string, mixed > $atts Additional attributes for the pattern. ie ['pattern-height' => 0.08]
+	 * @param string                      $pattern The pattern name to generate. ie 'waves'
+	 * @param string                      $id Unique identifier for the transition.
+	 * @param array<string, string|float> $atts Additional attributes for the pattern. ie ['pattern-height' => 0.08]
 	 * @return string Generated SVG and CSS styles
 	 */
 	public static function insert_inline_css( string $pattern, string $id, array $atts = [] ): string {
@@ -91,13 +94,30 @@ final class InlineCSS {
 		$generator = SVG_Generator_Factory::create( $pattern, $id, $atts );
 		$svg       = $generator->generate_svg();
 
+		/**
+		 * $atts ie: [
+		 *   'pattern-height' => 0.08,
+		 *   'pattern-width'  => 0.1,
+		 *   'y-offset'       => -0.12,
+		 * ]
+		 */
 		// The inline css. When used in the editor, we select the div with [data-block], not [data-cocovisualtransitionid]
-		$css = '<style id="coco-vt-' . esc_attr( $id ) . '">
-            [data-cocovisualtransitionid="' . $id . '"]{
-                clip-path: url(#pattern-' . $id . ');
-                webkit-clip-path: url(#pattern-' . $id . ');
-            }
-    </style>';
+		ob_start(); ?>
+		<style id="coco-vt-<?php echo esc_attr( $id ); ?>">
+				[data-cocovisualtransitionid="<?php echo esc_attr( $id ); ?>"]{
+						clip-path: url(#pattern-<?php echo esc_attr( $id ); ?>);
+						webkit-clip-path: url(#pattern-<?php echo esc_attr( $id ); ?>);
+						<?php
+						// We add negative margin to 'merge' the core/block with the previous block on top.
+						if ( ! empty( $atts['y-offset'] )) : ?>
+						margin-top: <?php echo esc_html( $atts['y-offset'] );?>px;
+						<?php
+						endif;
+						?>
+				}
+		</style>
+		<?php
+		$css = ob_get_clean();
 
 		return $svg . $css;
 	}
@@ -142,7 +162,7 @@ final class InlineCSS {
 				/**
 				 * Pattern attributes with height settings
 				 *
-				 * @var array<string, float> $pattern_attrs
+				 * @var array<string, string|float> $pattern_attrs
 				 */
 				$pattern_attrs = isset( $params['pattern_atts'] ) ? (array) $params['pattern_atts'] : [];
 
@@ -150,7 +170,11 @@ final class InlineCSS {
 				$svg_and_style = self::insert_inline_css(
 					sanitize_text_field( $pattern_name ),
 					sanitize_text_field( $block_id ),
-					$pattern_attrs
+					[
+						'pattern-height' => isset( $pattern_attrs['patternHeight'] )? (float) $pattern_attrs['patternHeight'] : 0.08,
+						'pattern-width'  => isset( $pattern_attrs['patternWidth'] )? (float) $pattern_attrs['patternWidth'] : 0.1,
+						'y-offset'       => isset( $pattern_attrs['YOffset'] )? (int) $pattern_attrs['YOffset'] : 0,
+					]
 				);
 
 				// change the name of the selector, which is different in the editor than in the FE.

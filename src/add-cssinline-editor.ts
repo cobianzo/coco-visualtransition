@@ -9,21 +9,29 @@ declare global {
 	}
 }
 
+interface PatternAttributes {
+    patternHeight?: number;
+    patternWidth?: number;
+    YOffset?: number;
+}
+
+
 
 /**
  * Makes an AJAX call to get inline CSS for SVG elements fro mthe php class
  *
  * @returns string Promise that resolves with the processed CSS
  */
-export async function getInlineCssSvg(patternName: string, blockId: string, atts: Array<string>): Promise<string> {
-	console.log('%c TODELETE: calling', 'color: red', blockId);
+export async function getInlineCssSvg(patternName: string, blockId: string, atts: PatternAttributes): Promise<string> {
+
+	// check the PHP endpoint
 	const css: string = await apiFetch({
 		path: 'coco/v1/vtstyle',
 		method: 'POST',
 		data: {
 			pattern_name: patternName,
 			block_id: blockId,
-			pattern_atts: atts
+			pattern_atts: atts //  ie. { patternHeight: 0.08, patternWidth: 0.2, YOffset: -40}
 		}
 	});
 

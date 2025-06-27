@@ -30,17 +30,4 @@ class Triangles_SVG extends SVG_Generator {
 	 */
 	public string $id;
 
-	/**
-	 * The height of the pattern relative to viewport.
-	 *
-	 * @var float
-	 */
-	public float $pattern_height = 0.1;
-
-	/**
-	 * The number of triangle figures to generate.
-	 *
-	 * @var int
-	 */
-	public int $number_figures = 3;
 }

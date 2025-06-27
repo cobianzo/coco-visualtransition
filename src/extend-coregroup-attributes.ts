@@ -9,6 +9,18 @@ const customAttributes = {
 		type: 'string',
 		default: '',
 	},
+	patternHeight: {
+		type: 'float',
+		default: 0.08,
+	},
+	patternWidth: {
+		type: 'float',
+		default: 0.3333,
+	},
+	YOffset: {
+		type: 'integer',
+		default: -0,
+	},
 };
 
 /**

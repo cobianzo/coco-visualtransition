@@ -6,7 +6,7 @@ import { useState, useEffect } from "@wordpress/element";
 import { addFilter } from "@wordpress/hooks";
 import { createHigherOrderComponent } from "@wordpress/compose";
 import { InspectorControls } from "@wordpress/block-editor";
-import { PanelBody, CheckboxControl, SelectControl } from "@wordpress/components";
+import { PanelBody, CheckboxControl, SelectControl, RangeControl } from "@wordpress/components";
 import { Fragment } from "@wordpress/element";
 import { __ } from "@wordpress/i18n";
 
@@ -38,23 +38,34 @@ const newCoreBlock = createHigherOrderComponent(
 			visualTransitionName !== "",
 		);
 
+		// COMPUTED:
+		// Compute whether to show pattern width control based on if pattern contains 'y_size'
+		const showPatternHeightControl = usePatternData(props.attributes.visualTransitionName)?.pattern?.includes('y_size') ?? false;
+		const showPatternWidthControl = usePatternData(props.attributes.visualTransitionName)?.pattern?.includes('x_size') ?? false;
+
+
+		// WATCH and UPDATE:
 		// now the extra classes in the editor depending on the attributes.
 		// Only update className if it has changed to avoid unnecessary re-renders
 		useEffect( () => {
 
-			console.log('%c TODELETE: we create/update the style for the block', 'font-size:1rem;color:pink', props.clientId, props.attributes)
-
 			const patternName = props.attributes.visualTransitionName;
 			if (checkBoxOn && patternName.length) {
-				getInlineCssSvg(patternName, props.clientId, props.attributes).then( (inlineCSSandSVG) => {
+				getInlineCssSvg(patternName, props.clientId, props.attributes).then( (inlineCSSandSVG: string) => {
+					/**
+					 * adds <div id="" >
+					 * 				<style>.selector-block{ clip - path: url(#idunico) ... </style>
+					 * 				<svg> <clipPath id=#idunico  ... </svg>
+					 */
 					appendInlineCss(props.clientId, inlineCSSandSVG);
 				});
 			}else {
+				// visual transition deactivated: we delete the styles, if any was applied.
 				deleteInlineCss(props.clientId);
 			}
 
 
-		}, [props.attributes, checkBoxOn, visualTransitionName]);
+		}, [props.attributes, checkBoxOn, visualTransitionName, props.clientId]); // WATCH changes in attrs.
 
 		return (
 			<Fragment>
@@ -69,14 +80,49 @@ const newCoreBlock = createHigherOrderComponent(
 						/>
 
 						{checkBoxOn && (
-							<SelectControl
-								label={__("Select Transition Effect", "coco-visualtransition")}
-								value={visualTransitionName}
-								options={ [ { 'label': '---', value: '' },  ...patterns.map( ( pattern ) => ( { 'label': pattern.label, value: pattern.value } ))]}
-								onChange={(value: string) =>
-									setAttributes({ visualTransitionName: value })
+							<>
+								<SelectControl
+									label={__("Select Transition Effect", "coco-visualtransition")}
+									value={visualTransitionName}
+									options={ [ { 'label': '---', value: '' },  ...patterns.map( ( pattern ) => ( { 'label': pattern.label, value: pattern.value } ))]}
+									onChange={(value: string) =>
+										setAttributes({ visualTransitionName: value })
+									}
+								/>
+								{ showPatternHeightControl &&  <RangeControl
+										label={__("Pattern Height %", "coco-visualtransition")}
+										value={attributes.patternHeight || 0.1}
+										onChange={(value) => setAttributes({ patternHeight: value })}
+										min={0.0}
+										max={1.0}
+										step={0.01}
+										help={__("Adjust the height of the transition pattern %", "coco-visualtransition")}
+								/>
 								}
-							/>
+
+								{ showPatternWidthControl &&  <RangeControl
+										label={__("Pattern Width %", "coco-visualtransition")}
+										value={attributes.patternWidth || 0.2}
+										onChange={(value) => setAttributes({ patternWidth: value })}
+										min={0.0}
+										max={1.0}
+										step={0.01}
+										help={__("Adjust the width of the transition pattern", "coco-visualtransition")}
+								/>
+								}
+
+								<RangeControl
+										label={__("Negative offset Y (px)", "coco-visualtransition")}
+										value={attributes.YOffset}
+										onChange={(value) => setAttributes({ YOffset: value })}
+										min={-100}
+										max={0}
+										step={1}
+										help={ (attributes.YOffset === 0) ?
+											__("Overlap the group with the precendent group by translating it on the Y axis", "coco-visualtransition")
+										: __("You are overwritting the margin top: please note that the margin top of this block can not be edited under the Styles tab.", "coco-visualtransition") }
+								/>
+							</>
 						)}
 					</PanelBody>
 				</InspectorControls>
@@ -87,3 +133,21 @@ const newCoreBlock = createHigherOrderComponent(
 );
 
 addFilter("editor.BlockEdit", "coco/extend-group-inspector", newCoreBlock);
+
+
+
+// Custom hook to get pattern data based on selected pattern name
+
+const usePatternData = (visualTransitionName: string) => {
+	/** returns
+	 * {
+    "label": "Triangles",
+    "value": "triangles",
+    "pattern": "{x_size} {y_size}, {2*x_size} 0",
+    "patternRepeat": "repeat-x"
+  }
+	 */
+	return React.useMemo(() => {
+		return patterns.find(pattern => pattern.value === visualTransitionName);
+	}, [visualTransitionName]);
+};
