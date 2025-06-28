@@ -176,17 +176,25 @@ class SVG_Generator {
 		}
 
 		$shape_string = sprintf( $shape_string, $points );
-
+		$pattern_id   = self::get_pattern_id( $this->id );
 		$this->svg_string = <<<SVG
 <svg width="0" height="0">
 	<defs>
-		<clipPath id="pattern-$this->id" clipPathUnits="objectBoundingBox">
+		<clipPath id="$pattern_id" clipPathUnits="objectBoundingBox">
 			$shape_string
 		</clipPath>
 	</defs>
 </svg>
 SVG;
 		return $this->svg_string;
+	}
+
+
+	/**
+	 * Helper.
+	 */
+	public static function get_pattern_id( string $id ): string {
+		return "pattern-$id";
 	}
 
 	/**

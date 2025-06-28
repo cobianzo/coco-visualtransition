@@ -1,6 +1,6 @@
 // generic to avoid warnings about missing types
 import * as React from '@wordpress/element';
-import { useState, useEffect } from "@wordpress/element";
+import { useState, useEffect, useRef } from "@wordpress/element";
 
 // WordPress dependencies
 import { addFilter } from "@wordpress/hooks";
@@ -43,6 +43,9 @@ const newCoreBlock = createHigherOrderComponent(
 		const showPatternHeightControl = usePatternData(props.attributes.visualTransitionName)?.pattern?.includes('y_size') ?? false;
 		const showPatternWidthControl = usePatternData(props.attributes.visualTransitionName)?.pattern?.includes('x_size') ?? false;
 
+		// WATCH changes in YOffset and update native attribute style.margin.top.
+		const { YOffset, style = {} } = attributes;
+		useSyncYOffsetWithMarginTop({ YOffset, style, setAttributes });
 
 		// WATCH and UPDATE:
 		// now the extra classes in the editor depending on the attributes.
@@ -70,7 +73,7 @@ const newCoreBlock = createHigherOrderComponent(
 		return (
 			<Fragment>
 				<BlockEdit {...props} />
-				<InspectorControls>
+				<InspectorControls __experimentalGroup="styles">
 					<PanelBody title="Visual Transition" initialOpen={true}>
 						<CheckboxControl
 							label={__("Enable Visual Transition", "coco-visualtransition")}
@@ -136,8 +139,7 @@ addFilter("editor.BlockEdit", "coco/extend-group-inspector", newCoreBlock);
 
 
 
-// Custom hook to get pattern data based on selected pattern name
-
+// Helper: Custom hook to get pattern data based on selected pattern name
 const usePatternData = (visualTransitionName: string) => {
 	/** returns
 	 * {
@@ -151,3 +153,34 @@ const usePatternData = (visualTransitionName: string) => {
 		return patterns.find(pattern => pattern.value === visualTransitionName);
 	}, [visualTransitionName]);
 };
+
+
+/**
+ * Custom hook.
+ * Updates the margin top of the block when YOffset is changed.
+ *
+ * @param param0
+ */
+export function useSyncYOffsetWithMarginTop({ YOffset, style, setAttributes }) {
+	const previousYOffset = useRef(YOffset);
+
+	useEffect(() => {
+		if (YOffset === previousYOffset.current) return;
+		previousYOffset.current = YOffset;
+
+		const marginTop = YOffset !== 0 ? `${YOffset}px` : undefined;
+
+		const newStyle = {
+			...style,
+			spacing: {
+				...(style?.spacing || {}),
+				margin: {
+					...(style?.spacing?.margin || {}),
+					top: marginTop,
+				},
+			},
+		};
+
+		setAttributes({ style: newStyle });
+	}, [YOffset, setAttributes, style]);
+}

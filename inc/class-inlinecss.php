@@ -12,6 +12,7 @@
 
 namespace COCO\VisualTransition;
 
+use Coco\VisualTransition\SVG_Generator;
 use Coco\VisualTransition\SVG_Generator_Factory;
 
 // Exit if accessed directly
@@ -102,11 +103,12 @@ final class InlineCSS {
 		 * ]
 		 */
 		// The inline css. When used in the editor, we select the div with [data-block], not [data-cocovisualtransitionid]
+		$pattern_id = SVG_Generator::get_pattern_id( $id );
 		ob_start(); ?>
 		<style id="coco-vt-<?php echo esc_attr( $id ); ?>">
 				[data-cocovisualtransitionid="<?php echo esc_attr( $id ); ?>"]{
-						clip-path: url(#pattern-<?php echo esc_attr( $id ); ?>);
-						webkit-clip-path: url(#pattern-<?php echo esc_attr( $id ); ?>);
+						clip-path: url(#<?php echo esc_attr( $pattern_id ); ?>);
+						webkit-clip-path: url(#<?php echo esc_attr( $pattern_id ); ?>);
 						<?php
 						// We add negative margin to 'merge' the core/block with the previous block on top.
 						if ( ! empty( $atts['y-offset'] )) : ?>

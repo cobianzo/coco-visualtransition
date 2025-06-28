@@ -32,6 +32,8 @@ class SVG_Generator_Factory {
 				return new Squares_SVG( $pattern, $id, $atts );
 			case 'waves':
 				return new Waves_SVG( $pattern, $id, $atts );
+			case 'waves-2':
+				return new Waves_2_SVG( $pattern, $id, $atts );
 			default:
 				throw new \Exception(
 					sprintf(

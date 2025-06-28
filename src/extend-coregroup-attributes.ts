@@ -19,7 +19,7 @@ const customAttributes = {
 	},
 	YOffset: {
 		type: 'integer',
-		default: -0,
+		default: 0,
 	},
 };
 

@@ -14,5 +14,9 @@
     "value": "triangles",
     "pattern": "{x_size} {y_size}, {2*x_size} 0",
     "patternRepeat": "repeat-x"
+  },
+  {
+    "label": "Waves 2",
+    "value": "waves-2"
   }
 ]
