@@ -27,7 +27,7 @@ class Waves_SVG extends SVG_Generator {
 	/**
 	 * The number of wave figures to generate
 	 *
-	 * @var int
+	 * @var float
 	 */
 	public float $pattern_width = 10;
 

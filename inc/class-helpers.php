@@ -35,7 +35,7 @@ class Helpers {
 	 * Identifies format M -5.033 7.474 C 15.496 3.269 33.904 1.285 54.586 3.603  respect -0.1 0, 0.07 0, 0.07 0.16,
 	 *
 	 * @param string $string_path The path string to analyze for trajectory format.
-	 * @return array|false Returns array of path commands if valid trajectory, false otherwise.
+	 * @return array<int, string>|false Returns array of path commands if valid trajectory, false otherwise.
 	 */
 	public static function is_trajectory_path( string $string_path ): array|false {
 		// we call trajectory path, if the points use beizer vertex, we use path d, otherwise we use polygon, for right lines.
@@ -50,7 +50,6 @@ class Helpers {
 			$string_path = str_replace( '{' . $placeholder_name . '}', '{' . $placeholder_id . '}', $string_path );
 		}
 
-
 		$trajectory_path_chars = 'MmLlHhVvzCcSsQqTtAa';
 		$is_trajectory_path    = preg_match( '/[' . $trajectory_path_chars . ']/', $string_path );
 
@@ -64,17 +63,20 @@ class Helpers {
 				$command = $match[1];
 				$params  = trim( $match[2] );
 
-				// Reemplaza múltiples espacios por uno solo
-				$params = preg_replace( '/\s+/', ' ', $params );
+				// Replace multiple spaces with a single space
+				$params = (string) preg_replace( '/\s+/', ' ', $params );
 
-				// Separa los valores por espacios y junta con comas
-				$params = implode( ' ', preg_split( '/\s+/', $params ) );
+				// Split values by spaces and join with spaces
+				$params_array = preg_split( '/\s+/', $params );
+				if ( $params_array === false ) {
+					$params_array = [];
+				}
+				$params = implode( ' ', $params_array );
 
 				$result[] = $command . ' ' . $params;
 			}
 
-			// we finished, now we replace the placeholders back
-			// cleanup path removing placeholders like {x_size}
+			// Replace placeholders back
 			foreach ( $valid_placeholders as $placeholder_id => $placeholder_name ) {
 				$result = str_replace( '{' . $placeholder_id . '}', '{' . $placeholder_name . '}', $result );
 			}
@@ -86,23 +88,37 @@ class Helpers {
 	}
 
 	/**
-	 * Loads patterns.json
+	 * Loads patterns from JSON file
 	 *
-	 * @param string|null $single_pattern_name If provided, filters the result to the given pattern name.
-	 * @return array The loaded patterns data, filtered by pattern name if specified.
+	 * @return array<int, array<string, mixed>> The loaded patterns data
 	 */
-	public static function load_patterns_json( ?string $single_pattern_name = null ): array {
+	public static function load_patterns_json(): array {
 		$plugin_root       = plugin_dir_path( __DIR__ );
 		$patterns_filename = $plugin_root . '/src/patterns.json';
 		$patterns_json     = wp_json_file_decode( $patterns_filename, [ 'associative' => true ] );
 
-		if ( null !== $single_pattern_name ) {
-			$patterns_json = array_find(
-				$patterns_json,
-				fn( mixed $pattern_data ) => $single_pattern_name === ( ( (array) $pattern_data )['value'] ?? '' )
-			);
+		if ( ! is_array( $patterns_json ) ) {
+			return [];
 		}
 
-		return $patterns_json ?? [];
+		// @phpstan-ignore return.type
+		return $patterns_json;
+	}
+
+	/**
+	 * Load a specific pattern by name from patterns.json
+	 *
+	 * @param string $pattern_name The name of the pattern to load
+	 * @return array<string, mixed> The pattern data or empty array if not found
+	 */
+	public static function load_pattern_json( string $pattern_name ): array {
+		$patterns = self::load_patterns_json();
+
+		$found_pattern = array_filter(
+			$patterns,
+			fn( array $pattern ): bool => isset( $pattern['value'] ) && $pattern['value'] === $pattern_name
+		);
+
+		return reset( $found_pattern ) ?: [];
 	}
 }

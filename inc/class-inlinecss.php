@@ -22,6 +22,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 /**
  * InlineCSS Class
+ *
+ * Main class for handling inline CSS and SVG generation for visual transitions.
  */
 final class InlineCSS {
 
@@ -43,8 +45,10 @@ final class InlineCSS {
 	 * Frontend: Custom render function for group blocks with visual transition.
 	 * Appends, after the render of the block, the tags for <svg> and <style> elements.
 	 *
+	 * @phpstan-type MyBlockType array<string, mixed>
+	 *
 	 * @param string               $block_content The block content about to be rendered
-	 * @param array<string, mixed> $block The block object, with the attributes and inner blocks.
+	 * @param array<string, mixed> $block Los datos del bloque a procesar.
 	 * @return string Modified block content
 	 */
 	public static function render_block_with_html_attributes( string $block_content, array $block ): string {
@@ -66,8 +70,23 @@ final class InlineCSS {
 			);
 
 			$atts = [
+				/**
+				 * Pattern height value for the transition effect
+				 *
+				 * @phpstan-ignore cast.double
+				 */
 				'pattern-height' => isset( $block['attrs']['patternHeight'] ) ? (float) $block['attrs']['patternHeight'] : 0.08,
+				/**
+				 * Pattern width value for the transition effect
+				 *
+				 * @phpstan-ignore cast.double
+				 */
 				'pattern-width'  => isset( $block['attrs']['patternWidth'] ) ? (float) $block['attrs']['patternWidth'] : 0.1,
+				/**
+				 * Y-axis offset value for positioning the transition
+				 *
+				 * @phpstan-ignore cast.double
+				 */
 				'y-offset'       => isset( $block['attrs']['YOffset'] ) ? (float) $block['attrs']['YOffset'] : 0.0,
 			];
 
@@ -117,7 +136,7 @@ final class InlineCSS {
 						// the YOffset actually changes the style.margin-top, so this wouldn't be needed, but it helps to understand.
 						if ( ! empty( $atts['y-offset'] ) ) :
 							?>
-						margin-top: <?php echo esc_html( $atts['y-offset'] ); ?>px;
+						margin-top: <?php echo esc_html( (string) $atts['y-offset'] ); ?>px;
 							<?php
 						endif;
 						?>

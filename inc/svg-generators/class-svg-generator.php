@@ -54,13 +54,9 @@ class SVG_Generator {
 	public float $pattern_width;
 
 	/**
-	 * Pattern data loaded from JSON file
+	 * Pattern data loaded from JSON file.
 	 *
-	 * @var array{
-	 *     value?: string,
-	 *     patternRepeat?: string,
-	 *     pattern?: string
-	 * }
+	 * @var array<string, mixed>
 	 */
 	protected array $pattern_data;
 
@@ -86,11 +82,10 @@ class SVG_Generator {
 	 * @param array<string, mixed> $atts parameters to build the shape of the mask, like height of the fret in percentage.
 	 */
 	public function __construct( string $pattern_name = '', string $id = 'mi-greca', array $atts = [] ) {
-
 		$this->id           = $id;
 		$this->pattern_name = $pattern_name;
 
-		$this->pattern_data = Helpers::load_patterns_json( $pattern_name );
+		$this->pattern_data = Helpers::load_pattern_json( $pattern_name );
 
 		// init to empty, we'll generate the values.
 		$this->points_string = '';
@@ -115,10 +110,6 @@ class SVG_Generator {
 	public function generate_points(): string {
 		if ( ! empty( $this->pattern_name ) ) {
 
-			if ( empty( $this->pattern_data ) ) {
-				return $this->points_string;
-			}
-
 			$offset_x = 0.1;
 			$offset_y = 0.1;
 
@@ -136,36 +127,37 @@ class SVG_Generator {
 	/**
 	 * Replaces placeholder values in points string with actual coordinates.
 	 *
-	 * @param string $points_string The points string containing placeholders.
-	 * @param float  $base_x_coord  The base x coordinate to offset points.
-	 * @param array  $param_values  Array of parameter values to replace placeholders.
+	 * @param string               $points_string The points string containing placeholders.
+	 * @param float                $base_x_coord  The base x coordinate to offset points.
+	 * @param array<string, float> $param_values  Array of parameter values to replace placeholders.
 	 * @return string The processed points string with replaced values.
 	 */
 	public static function replace_points_placeholders( string $points_string, float $base_x_coord = 0.0, array $param_values = [] ): string {
-
 		// Sanitize points string by removing double spaces
-		$points_string = preg_replace( '/\s+/', ' ', trim( $points_string ) );
+		$points_string = preg_replace( '/\s+/', ' ', trim( (string) $points_string ) );
 		$scale         = $param_values['scale'] ?? 1.0;
 
 		// separate every coordenate
-		$points_array      = explode( ' ', trim( $points_string ) );
+		$points_array      = explode( ' ', trim( (string) $points_string ) );
 		$is_x              = true;
 		$new_points_string = '';
 
 		foreach ( $points_array as $coordenate ) {
 			foreach ( $param_values as $param_name => $param_value ) {
-				$coordenate = str_replace( "{{$param_name}}", (string) $param_value * $scale, $coordenate );
-				$coordenate = str_replace( "{2*$param_name}", (string) ( 2 * (float) $param_value * $scale ), $coordenate );
+				$param_value_str = (string) ( $param_value * $scale );
+				$coordenate      = str_replace( "{{$param_name}}", $param_value_str, $coordenate );
+				$coordenate      = str_replace( "{2*$param_name}", (string) ( 2 * $param_value * $scale ), $coordenate );
 			}
 
 			if ( is_numeric( $coordenate ) ) {
-				$coordenate = (float) $coordenate / $scale;
+				$coordenate_float = (float) $coordenate / $scale;
 
 				if ( $is_x ) {
-					$coordenate = (float) $coordenate + (float) $base_x_coord;
+					$coordenate_float += $base_x_coord;
 				}
 
-				$is_x = ! $is_x;
+				$coordenate = (string) $coordenate_float;
+				$is_x       = ! $is_x;
 			}
 
 			$new_points_string .= ( strlen( $new_points_string ) ? ' ' : '' ) . $coordenate;
@@ -232,9 +224,12 @@ SVG;
 	 */
 	public static function get_last_x_point( string $string_points ): float {
 		$points = preg_split( '/[,\s]+/', trim( $string_points ) );
+		if ( ! is_array( $points ) ) {
+			return 0.0;
+		}
 		$count  = count( $points );
-		$last_x = $count >= 2 ? trim( $points[ $count - 2 ] ) : 0;
-		$last_x = preg_replace( '/\s+/', ' ', trim( $last_x ) );
+		$last_x = $count >= 2 ? trim( (string) $points[ $count - 2 ] ) : '0';
+		$last_x = preg_replace( '/\s+/', ' ', $last_x );
 
 		return floatval( $last_x );
 	}
@@ -247,14 +242,15 @@ SVG;
 	 * @return float The extracted coordinate value
 	 */
 	public static function get_point_from_pair( string $pair_x_y, string $coordenate = 'x' ): float {
-		$pair_x_y = trim( preg_replace( '/\s+/', ' ', $pair_x_y ) );
+		$pair_x_y = trim( (string) preg_replace( '/\s+/', ' ', $pair_x_y ) );
 		$x_y      = explode( ' ', $pair_x_y );
 		$count    = count( $x_y );
-		if ( 'x' === $coordenate ) {
-			return isset( $x_y[ $count - 2 ] ) ? floatval( $x_y[ $count - 2 ] ) : 0.0;
+
+		if ( 'x' === $coordenate && isset( $x_y[ $count - 2 ] ) ) {
+			return floatval( $x_y[ $count - 2 ] );
 		}
-		if ( 'y' === $coordenate ) {
-			return isset( $x_y[ $count - 1 ] ) ? floatval( $x_y[ $count - 1 ] ) : 0.0;
+		if ( 'y' === $coordenate && isset( $x_y[ $count - 1 ] ) ) {
+			return floatval( $x_y[ $count - 1 ] );
 		}
 		return 0.0;
 	}
@@ -267,9 +263,12 @@ SVG;
 	 * @return string The generated points string for the SVG shape.
 	 */
 	public function generate_points_string_from_pattern( float $offset_x = 0, float $offset_y = 0.1 ): string {
-		$is_trajectory = Helpers::is_trajectory_path( trim( $this->pattern_data['pattern'] ) );
-		$pattern_array = false !== $is_trajectory ? $is_trajectory : explode( ',', trim( $this->pattern_data['pattern'] ) );
-		$scale         = $this->pattern_data['scale'] ?? 1;
+		$pattern       = is_string( $this->pattern_data['pattern'] )
+			? $this->pattern_data['pattern']
+			: '';
+		$is_trajectory = Helpers::is_trajectory_path( trim( $pattern ) );
+		$pattern_array = false !== $is_trajectory ? $is_trajectory : explode( ',', trim( $pattern ) );
+		$scale         = is_numeric( $this->pattern_data['scale'] ) ? (float) $this->pattern_data['scale'] : 1.0;
 		$start_point_x = 0 - $offset_x;
 		$end_point_x   = 1 + $offset_x;
 		$end_point_y   = 1 + $offset_y;

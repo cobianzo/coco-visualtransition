@@ -111,6 +111,13 @@ Installed PHPStan too.
 Both work ok, check composer.json scripts to run the phpcs, phpcbf and phpstan commands.
 Check AI-AGENT.md for more info.
 
+# PHPSTAN
+
+@TODO:
+I had problems creating a centralized php with types that I can reuse and import.
+I was not able to make it work, so sometimes I need to repeat relative complex types in every file.
+Iused scanFiles in phpstan.neon, added the lines in composer.json, cleared the cache...
+
 ## commands
 ```
 composer run lint,

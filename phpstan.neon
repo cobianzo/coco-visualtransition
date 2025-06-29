@@ -1,5 +1,6 @@
 parameters:
   level: max
+
   paths:
     - inc/
 
@@ -10,4 +11,3 @@ parameters:
 
   inferPrivatePropertyTypeFromConstructor: true
   reportUnmatchedIgnoredErrors: false
-
