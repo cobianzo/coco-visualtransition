@@ -41,6 +41,54 @@ final class InlineCSS {
 		add_action( 'rest_api_init', [ __CLASS__, 'register_rest_route_for_editor_use' ] );
 	}
 
+
+	/**
+	 * Reusable in Frontend and Backend.
+	 * Generate and insert inline CSS and SVG for visual transitions
+	 *
+	 * @param string                      $pattern The pattern name to generate. ie 'waves'
+	 * @param string                      $id Unique identifier for the transition.
+	 * @param array<string, string|float> $atts Additional attributes for the pattern. ie ['pattern-height' => 0.08]
+	 * @return string Generated SVG and CSS styles
+	 */
+	public static function insert_inline_css( string $pattern, string $id, array $atts = [] ): string {
+		require_once plugin_dir_path( __FILE__ ) . 'svg-generators/class-svg-generator-factory.php';
+
+		$generator = SVG_Generator_Factory::create( $pattern, $id, $atts );
+		$svg       = $generator->svg_string;
+
+		/**
+		 * $atts ie: [
+		 *   'pattern-height' => 0.08,
+		 *   'pattern-width'  => 0.1,
+		 *   'y-offset'       => -0.12,
+		 * ]
+		 */
+		// The inline css. When used in the editor, we select the div with [data-block], not [data-cocovisualtransitionid]
+		$pattern_id = $generator->get_pattern_id();
+		ob_start(); ?>
+		<style id="coco-vt-<?php echo esc_attr( $id ); ?>">
+				[data-cocovisualtransitionid="<?php echo esc_attr( $id ); ?>"]{
+						clip-path: url(#<?php echo esc_attr( $pattern_id ); ?>);
+						webkit-clip-path: url(#<?php echo esc_attr( $pattern_id ); ?>);
+						<?php
+						// We add negative margin to 'merge' the core/block with the previous block on top.
+						// the YOffset actually changes the style.margin-top, so this wouldn't be needed, but it helps to understand.
+						if ( ! empty( $atts['y-offset'] ) ) :
+							?>
+						margin-top: <?php echo esc_html( (string) $atts['y-offset'] ); ?>px;
+							<?php
+						endif;
+						?>
+				}
+		</style>
+		<?php
+		$css = ob_get_clean();
+
+		return $svg . $css;
+	}
+
+
 	/**
 	 * Frontend: Custom render function for group blocks with visual transition.
 	 * Appends, after the render of the block, the tags for <svg> and <style> elements.
@@ -101,51 +149,6 @@ final class InlineCSS {
 		}
 
 		return $block_content;
-	}
-
-	/**
-	 * Generate and insert inline CSS and SVG for visual transitions
-	 *
-	 * @param string                      $pattern The pattern name to generate. ie 'waves'
-	 * @param string                      $id Unique identifier for the transition.
-	 * @param array<string, string|float> $atts Additional attributes for the pattern. ie ['pattern-height' => 0.08]
-	 * @return string Generated SVG and CSS styles
-	 */
-	public static function insert_inline_css( string $pattern, string $id, array $atts = [] ): string {
-		require_once plugin_dir_path( __FILE__ ) . 'svg-generators/class-svg-generator-factory.php';
-
-		$generator = SVG_Generator_Factory::create( $pattern, $id, $atts );
-		$svg       = $generator->svg_string;
-
-		/**
-		 * $atts ie: [
-		 *   'pattern-height' => 0.08,
-		 *   'pattern-width'  => 0.1,
-		 *   'y-offset'       => -0.12,
-		 * ]
-		 */
-		// The inline css. When used in the editor, we select the div with [data-block], not [data-cocovisualtransitionid]
-		$pattern_id = $generator->get_pattern_id();
-		ob_start(); ?>
-		<style id="coco-vt-<?php echo esc_attr( $id ); ?>">
-				[data-cocovisualtransitionid="<?php echo esc_attr( $id ); ?>"]{
-						clip-path: url(#<?php echo esc_attr( $pattern_id ); ?>);
-						webkit-clip-path: url(#<?php echo esc_attr( $pattern_id ); ?>);
-						<?php
-						// We add negative margin to 'merge' the core/block with the previous block on top.
-						// the YOffset actually changes the style.margin-top, so this wouldn't be needed, but it helps to understand.
-						if ( ! empty( $atts['y-offset'] ) ) :
-							?>
-						margin-top: <?php echo esc_html( (string) $atts['y-offset'] ); ?>px;
-							<?php
-						endif;
-						?>
-				}
-		</style>
-		<?php
-		$css = ob_get_clean();
-
-		return $svg . $css;
 	}
 
 	/**

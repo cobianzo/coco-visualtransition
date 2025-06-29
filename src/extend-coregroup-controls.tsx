@@ -44,8 +44,7 @@ const newCoreBlock = createHigherOrderComponent(
 		const showPatternWidthControl = usePatternData(props.attributes.visualTransitionName)?.pattern?.includes('x_size') ?? false;
 
 		// WATCH changes in YOffset and update native attribute style.margin.top.
-		const { YOffset, style = {} } = attributes;
-		useSyncYOffsetWithMarginTop({ YOffset, style, setAttributes });
+		useSyncYOffsetWithMarginTop({ attributes, setAttributes });
 
 		// WATCH and UPDATE:
 		// now the extra classes in the editor depending on the attributes.
@@ -123,7 +122,7 @@ const newCoreBlock = createHigherOrderComponent(
 										step={1}
 										help={ (attributes.YOffset === 0) ?
 											__("Overlap the group with the precendent group by translating it on the Y axis", "coco-visualtransition")
-										: __("You are overwritting the margin top: please note that the margin top of this block can not be edited under the Styles tab.", "coco-visualtransition") }
+										: __("You are overwritting the margin top. This commands allows you to assign negative value to it.", "coco-visualtransition") }
 								/>
 							</>
 						)}
@@ -161,26 +160,35 @@ const usePatternData = (visualTransitionName: string) => {
  *
  * @param param0
  */
-export function useSyncYOffsetWithMarginTop({ YOffset, style, setAttributes }) {
+export function useSyncYOffsetWithMarginTop({ attributes, setAttributes }) {
+	const { YOffset, style = {} } = attributes;
 	const previousYOffset = useRef(YOffset);
+	const previousMarginTop = useRef(style?.spacing?.margin?.top);
 
 	useEffect(() => {
-		if (YOffset === previousYOffset.current) return;
-		previousYOffset.current = YOffset;
+		const newAttributes: { YOffset?: number; style?: object } = {};
+		const mt = style?.spacing?.margin?.top;
+		if ((mt || mt === 0) && mt !== previousMarginTop.current) {
+			newAttributes.YOffset = 0;
+		}
+		if (YOffset !== previousYOffset.current) {
+			previousYOffset.current = YOffset;
 
-		const marginTop = YOffset !== 0 ? `${YOffset}px` : undefined;
+			previousMarginTop.current = YOffset !== 0 ? `${YOffset}px` : undefined;
 
-		const newStyle = {
-			...style,
-			spacing: {
-				...(style?.spacing || {}),
-				margin: {
-					...(style?.spacing?.margin || {}),
-					top: marginTop,
+			const newStyle = {
+				...style,
+				spacing: {
+					...(style?.spacing || {}),
+					margin: {
+						...(style?.spacing?.margin || {}),
+						top: previousMarginTop.current,
+					},
 				},
-			},
-		};
+			};
+			newAttributes.style = newStyle;
 
-		setAttributes({ style: newStyle });
+		}
+		setAttributes(newAttributes);
 	}, [YOffset, setAttributes, style]);
 }
