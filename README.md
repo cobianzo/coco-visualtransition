@@ -5,6 +5,7 @@ TODO
 - add the option to move the group up to merge with the previous group.
 - Use masks
 - Include option to load the pattern from a svg file.
+- add cache when creating inline css. If already created.
 
 - localization
 
@@ -23,6 +24,27 @@ HOW IT WORKS
 3) The inline css includes a svg with an id, which is associated to the core/group as a mask with clip-path or mark-image.
 4) We use an SVG generator in php, which dyanmicaly generates a svg with the pattern, and includes it in the page.
 We use the development pattern 'factory' for it.
+
+DETAILS
+===
+All visual transitions, or shapes, must be defined in `patterns.json`.
+They must be included in the `inc/svg-generators/class-svg-generator-factory.php`,and the child class must be created.
+There are different ways to define a visual transition:
+- with the field 'pattern' of `pattern.json`, which defines the svg path points of the sape
+- overwriting the method generate_svg, in the php class of the svg pattern. ie inc/svg-generators/class-waves-svg.php
+- overwriting the method generate_points, "  ".
+
+TO ADD NEW PATTERNS
+===
+- Use an SVG editor, like Boxy https://boxy-svg.com/app .
+- Set viewBox to 0 0 100 100.
+- Create an horizontal line, from 0 to 100 in the x axis.
+- Copy and paste the shape in your VSCode editor.
+- Retrieve the value inside of d="". The fist vertex must be an 'L', not an 'M', and start by 0 for the x.
+- Better if the right edge x arrives to 120, so it compensate that the mask has negative x boundaries.
+- Copy the path points into the key 'pattern' in `patterns.json`.
+- Set the key 'scale' to 100.
+- If you want, you can use the placeholders {x_size} and {y_size}, and even{2*x_size}.}
 
 DEVELOPMENT
 ===
@@ -124,3 +146,12 @@ Then we can access locally o inside the container to wp-content/plugins/coco-vis
 
 ## Useful WP CLI commands
 
+...
+
+# Useful tools to develop shapes
+
+Helps to design the path
+https://codepen.io/anthonydugois/pen/mewdyZ
+
+Helps to undesrstand every point of the path.
+https://svg-path-visualizer.netlify.app/

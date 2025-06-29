@@ -1,5 +1,8 @@
 <?php
 
+// The tests: It's broken after the refactor of the genreator
+// Needs refactor here too
+
 use Coco\VisualTransition\SVG_Generator;
 
 /**
@@ -17,7 +20,7 @@ class GenerateSVGTest extends WP_UnitTestCase
 	public function test_get_last_x_point()
 	{
 		// Create an instance of SVG_Generator
-		$svg_generator = new SVG_Generator('', '', []);
+		$svg_generator = new SVG_Generator('waves', 'my-id', []);
 
 		// Test case 1: Empty points array
 		$points = '';

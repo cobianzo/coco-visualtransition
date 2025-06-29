@@ -40,7 +40,8 @@ final class InlineCSS {
 	}
 
 	/**
-	 * Frontend: Custom render function for group blocks with visual transition
+	 * Frontend: Custom render function for group blocks with visual transition.
+	 * Appends, after the render of the block, the tags for <svg> and <style> elements.
 	 *
 	 * @param string               $block_content The block content about to be rendered
 	 * @param array<string, mixed> $block The block object, with the attributes and inner blocks.
@@ -67,13 +68,14 @@ final class InlineCSS {
 			$atts = [
 				'pattern-height' => isset( $block['attrs']['patternHeight'] ) ? (float) $block['attrs']['patternHeight'] : 0.08,
 				'pattern-width'  => isset( $block['attrs']['patternWidth'] ) ? (float) $block['attrs']['patternWidth'] : 0.1,
-				'y-offset'  => isset( $block['attrs']['YOffset'] ) ? (float) $block['attrs']['YOffset'] : 0.0,
+				'y-offset'       => isset( $block['attrs']['YOffset'] ) ? (float) $block['attrs']['YOffset'] : 0.0,
 			];
 
 
 			$pattern = is_string( $block['attrs']['visualTransitionName'] )
 				? $block['attrs']['visualTransitionName']
 				: '';
+
 
 			$svg_and_style  = self::insert_inline_css( $pattern, $random_id, $atts );
 			$block_content .= $svg_and_style;
@@ -92,8 +94,9 @@ final class InlineCSS {
 	 */
 	public static function insert_inline_css( string $pattern, string $id, array $atts = [] ): string {
 		require_once plugin_dir_path( __FILE__ ) . 'svg-generators/class-svg-generator-factory.php';
+
 		$generator = SVG_Generator_Factory::create( $pattern, $id, $atts );
-		$svg       = $generator->generate_svg();
+		$svg       = $generator->svg_string;
 
 		/**
 		 * $atts ie: [
@@ -103,7 +106,7 @@ final class InlineCSS {
 		 * ]
 		 */
 		// The inline css. When used in the editor, we select the div with [data-block], not [data-cocovisualtransitionid]
-		$pattern_id = SVG_Generator::get_pattern_id( $id );
+		$pattern_id = $generator->get_pattern_id();
 		ob_start(); ?>
 		<style id="coco-vt-<?php echo esc_attr( $id ); ?>">
 				[data-cocovisualtransitionid="<?php echo esc_attr( $id ); ?>"]{
@@ -111,9 +114,11 @@ final class InlineCSS {
 						webkit-clip-path: url(#<?php echo esc_attr( $pattern_id ); ?>);
 						<?php
 						// We add negative margin to 'merge' the core/block with the previous block on top.
-						if ( ! empty( $atts['y-offset'] )) : ?>
-						margin-top: <?php echo esc_html( $atts['y-offset'] );?>px;
-						<?php
+						// the YOffset actually changes the style.margin-top, so this wouldn't be needed, but it helps to understand.
+						if ( ! empty( $atts['y-offset'] ) ) :
+							?>
+						margin-top: <?php echo esc_html( $atts['y-offset'] ); ?>px;
+							<?php
 						endif;
 						?>
 				}
@@ -173,9 +178,9 @@ final class InlineCSS {
 					sanitize_text_field( $pattern_name ),
 					sanitize_text_field( $block_id ),
 					[
-						'pattern-height' => isset( $pattern_attrs['patternHeight'] )? (float) $pattern_attrs['patternHeight'] : 0.08,
-						'pattern-width'  => isset( $pattern_attrs['patternWidth'] )? (float) $pattern_attrs['patternWidth'] : 0.1,
-						'y-offset'       => isset( $pattern_attrs['YOffset'] )? (int) $pattern_attrs['YOffset'] : 0,
+						'pattern-height' => isset( $pattern_attrs['patternHeight'] ) ? (float) $pattern_attrs['patternHeight'] : 0.08,
+						'pattern-width'  => isset( $pattern_attrs['patternWidth'] ) ? (float) $pattern_attrs['patternWidth'] : 0.1,
+						'y-offset'       => isset( $pattern_attrs['YOffset'] ) ? (int) $pattern_attrs['YOffset'] : 0,
 					]
 				);
 

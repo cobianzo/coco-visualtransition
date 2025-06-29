@@ -23,24 +23,20 @@ class SVG_Generator_Factory {
 	 */
 	public static function create( string $pattern, string $id, array $atts = [] ) {
 
-		require_once plugin_dir_path( __FILE__ ) . "class-$pattern-svg.php";
+		$file_path = plugin_dir_path( __FILE__ ) . "class-$pattern-svg.php";
+		if ( file_exists( $file_path ) ) {
+			// phpcs:ignore WordPressVIPMinimum.Files.IncludingFile.UsingVariable
+			require_once $file_path;
+		}
 
 		switch ( $pattern ) {
-			case 'triangles':
-				return new Triangles_SVG( $pattern, $id, $atts );
 			case 'squares':
 				return new Squares_SVG( $pattern, $id, $atts );
 			case 'waves':
 				return new Waves_SVG( $pattern, $id, $atts );
-			case 'waves-2':
-				return new Waves_2_SVG( $pattern, $id, $atts );
 			default:
-				throw new \Exception(
-					sprintf(
-						'Invalid SVG generator type: %s',
-						esc_html( $pattern )
-					)
-				);
+				// Generic
+				return new SVG_Generator( $pattern, $id, $atts );
 		}
 	}
 
@@ -50,7 +46,7 @@ class SVG_Generator_Factory {
 	 * @return string[] List of available generator types
 	 */
 	public static function get_available_types(): array {
-		$patterns_json = SVG_Generator::load_patterns_json();
+		$patterns_json = Helpers::load_patterns_json();
 		return array_map( fn( $patt ) => $patt['value'], $patterns_json );
 	}
 }

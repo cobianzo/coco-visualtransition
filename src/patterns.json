@@ -1,22 +1,34 @@
 [
   {
     "label": "Waves",
-    "value": "waves"
+    "value": "waves",
+    "pattern": "0 {y_size}, {x_size} {y_size}, {x_size} 0",
+    "scale": 100
   },
   {
     "label": "Squares",
     "value": "squares",
     "pattern": "{x_size} 0, {x_size} {y_size}, {2*x_size} {y_size}, {2*x_size} 0",
-    "patternRepeat": "repeat-x"
+    "patternRepeat": "repeat-x",
+    "scale": 1
   },
   {
     "label": "Triangles",
     "value": "triangles",
-    "pattern": "{x_size} {y_size}, {2*x_size} 0",
-    "patternRepeat": "repeat-x"
+    "pattern": "L 0 {y_size} L {x_size} 0 L {2*x_size} {y_size}",
+    "patternRepeat": "repeat-x",
+    "scale": 100
   },
   {
-    "label": "Waves 2",
-    "value": "waves-2"
+    "label": "Irregular triangles 1",
+    "value": "irregular-triangles-1",
+    "pattern": "L 0 5.449 L 12.362 1.058 L 30.91 10.02 L 54.314 6.735 L 84.487 10.04 L 120 4.443",
+    "scale": 100
+  },
+  {
+    "label": "Slope 1",
+    "value": "slopw-1",
+    "pattern": "L -5.033 7.474 C 15.496 3.269 33.904 1.285 54.586 3.603 C 64.577 4.723 74.742 10.648 84.471 13.26 C 92.802 15.496 103.067 14.696 130.572 16.959",
+    "scale": 100
   }
 ]

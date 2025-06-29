@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Class Triangle_SVG
+ * Class Squares
  * Handles generation and manipulation of triangle SVG elements
  * PATTERN SQUARES, created programmatically as a path.
  * ================================================
@@ -28,5 +28,4 @@ class Squares_SVG extends SVG_Generator {
 	 * @var string
 	 */
 	public string $id;
-
 }

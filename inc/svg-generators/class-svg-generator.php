@@ -9,6 +9,8 @@
 
 namespace Coco\VisualTransition;
 
+use Coco\VisualTransition\Helpers;
+
 /**
  * The parent class that initializes the generic stuff,
  * and the child classes will extend it.
@@ -19,6 +21,7 @@ namespace Coco\VisualTransition;
  * Important: svg_string ( and points_string ) is whan determines the shape of the svg, that's what matters.
  *
  * We never call this class directly (we call the children classes for evert pattern shape)
+ * We call  `SVG _ Generator _ Factory :: create`
  */
 class SVG_Generator {
 
@@ -87,20 +90,21 @@ class SVG_Generator {
 		$this->id           = $id;
 		$this->pattern_name = $pattern_name;
 
+		$this->pattern_data = Helpers::load_patterns_json( $pattern_name );
+
 		// init to empty, we'll generate the values.
 		$this->points_string = '';
 		$this->svg_string    = '';
 
 		// the $atts params which customizes the pattern mask.
 		$this->pattern_height = ( isset( $atts['pattern-height'] ) && '' !== $atts['pattern-height'] )
-			? (float) self::to_float( $atts['pattern-height'] ) : 0.1;
+			? (float) Helpers::to_float( $atts['pattern-height'] ) : 0.1;
 
 		$this->pattern_width = ( isset( $atts['pattern-width'] ) && '' !== $atts['pattern-width'] )
-			? (float) self::to_float( $atts['pattern-width'] ) : 0.1;
-
-
+			? (float) Helpers::to_float( $atts['pattern-width'] ) : 0.1;
 
 		$this->generate_points();
+		$this->generate_svg();
 	}
 
 	/**
@@ -111,49 +115,63 @@ class SVG_Generator {
 	public function generate_points(): string {
 		if ( ! empty( $this->pattern_name ) ) {
 
-			// loads the pattern single
-			$patterns_json = self::load_patterns_json();
-
-			if ( empty( $patterns_json ) ) {
+			if ( empty( $this->pattern_data ) ) {
 				return $this->points_string;
 			}
 
-			/**
-			 * Fret pattern array structure containing optional value, patternRepeat and pattern strings.
-			 *
-			 * @var array{value?: string, patternRepeat?: string, pattern?: string}|null $pattern
-			 */
-			$pattern = array_find(
-				$patterns_json,
-				fn( mixed $pattern_data ) => $this->pattern_name === ( ( (array) $pattern_data )['value'] ?? '' )
-			);
+			$offset_x = 0.1;
+			$offset_y = 0.1;
 
-			if ( ! is_array( $pattern ) ) {
-				return $this->points_string;
-			}
-
-			$this->pattern_data = $pattern;
-
-			if ( ! empty( $this->pattern_data['patternRepeat'] ) ) {
-				if ( 'repeat-x' === $this->pattern_data['patternRepeat'] ) {
-					// prepare the pattern for single figure using
-					// now we loop the pattern moving right until getting the 100% (end_point_x).
-					$offset_x = 0.1;
-					$offset_y = 0.1;
-
-					if ( isset( $this->pattern_data['pattern'] ) ) {
-						$this->points_string = self::generate_points_string_from_pattern(
-							$this->pattern_data['pattern'],
-							$this->pattern_width,
-							$this->pattern_height,
-							$offset_x,
-							$offset_y
-						);
-					}
-				}
+			if ( isset( $this->pattern_data['pattern'] ) ) {
+				$this->points_string = $this->generate_points_string_from_pattern(
+					$offset_x,
+					$offset_y
+				);
 			}
 		}
+
 		return $this->points_string;
+	}
+
+	/**
+	 * Replaces placeholder values in points string with actual coordinates.
+	 *
+	 * @param string $points_string The points string containing placeholders.
+	 * @param float  $base_x_coord  The base x coordinate to offset points.
+	 * @param array  $param_values  Array of parameter values to replace placeholders.
+	 * @return string The processed points string with replaced values.
+	 */
+	public static function replace_points_placeholders( string $points_string, float $base_x_coord = 0.0, array $param_values = [] ): string {
+
+		// Sanitize points string by removing double spaces
+		$points_string = preg_replace( '/\s+/', ' ', trim( $points_string ) );
+		$scale         = $param_values['scale'] ?? 1.0;
+
+		// separate every coordenate
+		$points_array      = explode( ' ', trim( $points_string ) );
+		$is_x              = true;
+		$new_points_string = '';
+
+		foreach ( $points_array as $coordenate ) {
+			foreach ( $param_values as $param_name => $param_value ) {
+				$coordenate = str_replace( "{{$param_name}}", (string) $param_value * $scale, $coordenate );
+				$coordenate = str_replace( "{2*$param_name}", (string) ( 2 * (float) $param_value * $scale ), $coordenate );
+			}
+
+			if ( is_numeric( $coordenate ) ) {
+				$coordenate = (float) $coordenate / $scale;
+
+				if ( $is_x ) {
+					$coordenate = (float) $coordenate + (float) $base_x_coord;
+				}
+
+				$is_x = ! $is_x;
+			}
+
+			$new_points_string .= ( strlen( $new_points_string ) ? ' ' : '' ) . $coordenate;
+		}
+
+		return $new_points_string;
 	}
 
 	/**
@@ -164,21 +182,26 @@ class SVG_Generator {
 	public function generate_svg(): string {
 		$points = $this->points_string;
 
-		// sanitization
 		if ( false === strpos( $points, 'Z' ) ) {
 			$points .= 'Z';
 		}
 
-		// if the points use beizer vertex, we use path d, otherwise we use polygon, for right lines.
-		$shape_string = '<polygon points="%s" />';
-		if ( false !== strpos( $points, 'C ' ) || false !== strpos( $points, 'S' ) ) {
-			$shape_string = '<path d="%s" />';
-		}
+		$extra_attrs = [
+			'style' => 'position:absolute;overflow:hidden;',
+		];
 
-		$shape_string = sprintf( $shape_string, $points );
-		$pattern_id   = self::get_pattern_id( $this->id );
+		$is_trajectory_path = Helpers::is_trajectory_path( $points );
+		$shape_string       = $is_trajectory_path ? '<path d="%s" />' : '<polygon points="%s" />';
+		$shape_string       = sprintf( $shape_string, $points );
+		$pattern_id         = $this->get_pattern_id();
+		$extra_attrs_string = array_reduce(
+			array_keys( $extra_attrs ),
+			fn( string $carry, string $attr ) => $carry . ' ' . sprintf( '%s="%s"', $attr, esc_attr( $extra_attrs[ $attr ] ) ),
+			''
+		);
+
 		$this->svg_string = <<<SVG
-<svg width="0" height="0">
+<svg width="0" height="0" $extra_attrs_string>
 	<defs>
 		<clipPath id="$pattern_id" clipPathUnits="objectBoundingBox">
 			$shape_string
@@ -189,130 +212,94 @@ SVG;
 		return $this->svg_string;
 	}
 
-
 	/**
-	 * Helper.
+	 * Helper. The id for the <clipPath id="<pattern-unique-id".
+	 * It will also be referenced in the css at the clip-path: url(#<pattern-unique-id")
+	 *
+	 * @return string The pattern ID string.
 	 */
-	public static function get_pattern_id( string $id ): string {
-		return "pattern-$id";
+	public function get_pattern_id(): string {
+		return "pattern-$this->id";
 	}
 
 	/**
 	 * Helper.
-	 * From a set of points as a string in $this0>points_string or the arg, ie ( 0 0, 1 1, 2 0, 3 1, 4 0 ).
+	 * From a set of points as a string in $this->points_string or the arg, ie ( 0 0, 1 1, 2 0, 3 1, 4 0 ).
 	 * returns the last x point. (in this case (int) 4)
 	 *
-	 * @param string|null $overwrite_points Optional points string to use instead of $this->points_string.
+	 * @param string $string_points The points string to extract the last x coordinate from.
 	 * @return float The last x coordinate value.
 	 */
-	public function get_last_x_point( ?string $overwrite_points ): float {
-		$string_points = $overwrite_points ?? $this->points_string;
+	public static function get_last_x_point( string $string_points ): float {
+		$points = preg_split( '/[,\s]+/', trim( $string_points ) );
+		$count  = count( $points );
+		$last_x = $count >= 2 ? trim( $points[ $count - 2 ] ) : 0;
+		$last_x = preg_replace( '/\s+/', ' ', trim( $last_x ) );
 
-		$points     = explode( ',', trim( $string_points ) );
-		$last_point = trim( end( $points ) );
-		$last_point = preg_replace( '/\s+/', ' ', trim( $last_point ) );
-
-		$last_x = explode( ' ', (string) $last_point )[0];
-		$last_x = floatval( $last_x );
-
-		return $last_x;
+		return floatval( $last_x );
 	}
 
 	/**
-	 * simple helper
+	 * Simple helper. From '4.5 3.0' returns the required point. ( 4.5 if arg $coordenate is 'x')
 	 *
-	 * @param string $pair_x_y A string containing two numbers separated by space (e.g. "12 3")
+	 * @param string  $pair_x_y   A string containing two numbers separated by space (e.g. "12 3")
 	 * @param 'x'|'y' $coordenate Either 'x' or 'y' coordinate to extract from the pair
-	 * @return float
+	 * @return float The extracted coordinate value
 	 */
 	public static function get_point_from_pair( string $pair_x_y, string $coordenate = 'x' ): float {
-		$pair_x_y = trim( preg_replace( '/\s+/', ' ', $pair_x_y ) ); // cleanup
+		$pair_x_y = trim( preg_replace( '/\s+/', ' ', $pair_x_y ) );
 		$x_y      = explode( ' ', $pair_x_y );
+		$count    = count( $x_y );
 		if ( 'x' === $coordenate ) {
-			return isset( $x_y[0] )? floatval( $x_y[0] ) : 0.0;
+			return isset( $x_y[ $count - 2 ] ) ? floatval( $x_y[ $count - 2 ] ) : 0.0;
 		}
 		if ( 'y' === $coordenate ) {
-			return isset( $x_y[1] )? floatval( $x_y[1] ) : 0.0;
+			return isset( $x_y[ $count - 1 ] ) ? floatval( $x_y[ $count - 1 ] ) : 0.0;
 		}
 		return 0.0;
 	}
 
 	/**
-	 * Helper
-	 * from a given pattern string, using the placeholders for the gap of the x and y coords,
-	 * we repeat the pattern a number of times. Example of pattern: "0 0, {x_size} 0, {x_size} {y_size}, {2*x_size} {y_size}"
-	 * Will return something like: "0 0, 0.25 0, 0.25 0.05, 0.5 0.05, "
+	 * Generates points string from pattern by repeating it horizontally.
 	 *
-	 * @param string $pattern The pattern string containing placeholders for coordinates.
-	 * @param float  $pattern_height The height of each pattern repetition.
-	 * @param float  $pattern_width " " width " "
-	 * @param float  $offset_x The horizontal offset to apply to the pattern.
-	 * @param float  $offset_y The vertical offset to apply to the pattern.
+	 * @param float $offset_x The horizontal offset to apply to the pattern.
+	 * @param float $offset_y The vertical offset to apply to the pattern.
 	 * @return string The generated points string for the SVG shape.
 	 */
-	public static function generate_points_string_from_pattern( string $pattern, float $pattern_width = 0.0, float $pattern_height = 0.0, float $offset_x = 0, float $offset_y = 0.1 ): string {
-		// prepare the pattern for single figure using
-		// calculate boundaies of the the clip mask, we'll use it in the child.
+	public function generate_points_string_from_pattern( float $offset_x = 0, float $offset_y = 0.1 ): string {
+		$is_trajectory = Helpers::is_trajectory_path( trim( $this->pattern_data['pattern'] ) );
+		$pattern_array = false !== $is_trajectory ? $is_trajectory : explode( ',', trim( $this->pattern_data['pattern'] ) );
+		$scale         = $this->pattern_data['scale'] ?? 1;
 		$start_point_x = 0 - $offset_x;
 		$end_point_x   = 1 + $offset_x;
 		$end_point_y   = 1 + $offset_y;
 
-		// now we loop the pattern moving right until getting the 100% (end_point_x).
-		$points_string  = "$start_point_x 0";
-		$point_x_step   = $pattern_width;
-		$pattern_array = explode( ',', trim( $pattern ) );
+		$path_string = ( $is_trajectory ? 'M ' : '' ) . "$start_point_x 0";
+		$x_size      = $this->pattern_width;
 
+		$i = 0;
 		do {
+			$i++;
+			$latest_x_point = self::get_last_x_point( $path_string );
 
-			// iteration of one figure of the pattern, adapted to the current $latest_x_point.
-			$latest_x_point = ( new self() )->get_last_x_point( $points_string );
-
-			// we go coordenate by coordenate replacing the placeholders
-			foreach ( $pattern_array as $points ) { // we evaluate pair of `x, y`. ie `0.4 0.05` or `{x_size} 0`
-				$points = str_replace( '{x_size}', (string) $point_x_step, $points );
-				$points = str_replace( '{2*x_size}', (string) ( 2 * $point_x_step ), $points );
-				$points = str_replace( '{y_size}', (string) $pattern_height, $points );
-
-				// we run every `x , y` pair
-				$x   = self::get_point_from_pair( $points, 'x' );
-				$y   = self::get_point_from_pair( $points, 'y' );
-
-				$x              = $x + $latest_x_point;
-				$points_string .= ", $x $y";
+			$coordenates_from_pattern = '';
+			foreach ( $pattern_array as $points ) {
+				$coordenates_from_pattern .= ' ' . self::replace_points_placeholders( $points, $latest_x_point, [
+					'x_size' => $x_size,
+					'y_size' => $this->pattern_height,
+					'scale'  => $scale,
+				] );
 			}
+			$path_string   .= $coordenates_from_pattern;
+			$latest_x_point = self::get_last_x_point( $path_string );
 
-			$latest_x_point = ( new self() )->get_last_x_point( $points_string );
+		} while ( $latest_x_point < $end_point_x && $i < 15 );
 
-		} while ( $latest_x_point < $end_point_x );
+		$path_string .= ( $is_trajectory ? 'L' : '' ) . " $end_point_x 0";
+		$path_string .= ( $is_trajectory ? 'L' : '' ) . " $end_point_x $end_point_y";
+		$path_string .= ( $is_trajectory ? 'L' : '' ) . " $start_point_x $end_point_y";
+		$path_string .= $is_trajectory ? 'Z' : " $start_point_x 0";
 
-		$points_string .= sprintf( ', %s %s', $end_point_x, $y ?? 0 );;
-
-		// Close the path! now points_string follows the pattern at the top of the container.
-		// We close it with lines to the bottom right, and bottom left
-		$points_string .= ", $end_point_x $end_point_y, $start_point_x $end_point_y";
-		$points_string .= 'Z'; // closes the last point with the first point.
-
-		return $points_string;
-	}
-
-	/**
-	 * Just a helper. phpstan needs it.
-	 *
-	 * @param mixed $value the number or variable to convert into float, if possible
-	 * @param float $default the fallback
-	 * @return float
-	 */
-	protected static function to_float( mixed $value, float $default = 0.0 ): float {
-		if ( is_numeric( $value ) ) {
-			return (float) $value;
-		}
-		return $default;
-	}
-
-	public static function load_patterns_json(): array {
-		$plugin_root       = plugin_dir_path( dirname( __DIR__ ) );
-		$patterns_filename = $plugin_root. '/src/patterns.json';
-		$patterns_json     = wp_json_file_decode( $patterns_filename, [ 'associative' => true ] );
-		return $patterns_json ?? [];
+		return $path_string;
 	}
 }

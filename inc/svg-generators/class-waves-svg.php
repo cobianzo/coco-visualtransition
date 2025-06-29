@@ -38,19 +38,7 @@ class Waves_SVG extends SVG_Generator {
 	 */
 	public function generate_points(): string {
 		$this->points_string = <<<PATH_POINTS
-		M 0,$this->pattern_height
-		C 0.033,0.1 0.066,0 0.1,0
-		S 0.166,0.1 0.2,$this->pattern_height
-		S 0.266,0 0.3,0
-		S 0.366,0.1 0.4,$this->pattern_height
-		S 0.466,0 0.5,0
-		S 0.566,0.1 0.6,$this->pattern_height
-		S 0.666,0 0.7,0
-		S 0.766,0.1 0.8,$this->pattern_height
-		S 0.866,0 0.9,0
-		S 0.966,0.1 1,$this->pattern_height
-		L 1,1 L 0,1
-		Z
+		M 0.032 0.095 L 0.249 0.024 C 0.249 0.024 0.566 0.176 0.646 0.115 C 0.725 0.055 0.833 0 0.961 0.005 C 1.088 0.009 0.999 1 0.999 1 L 0 0.996 L 0.009 0.091 L 0.032 0.095 Z
 PATH_POINTS;
 
 		return $this->points_string;
