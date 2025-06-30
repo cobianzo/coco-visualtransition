@@ -8,9 +8,14 @@
 // Usage: `node ./bin/version-increment.js minor`
 // Usage: `node ./bin/version-increment.js major`
 
-const fs = require('fs');
-const path = require('path');
-const semver = require('semver');
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import semver from 'semver';
+import { extractVersion } from './version-helpers.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Paths to your files
 const FILES = {
@@ -58,8 +63,6 @@ function updateVersion(incrementType = 'patch', silent = false) {
 		}
 
 		// Extract the current version from plugin.php (source of truth)
-		const { extractVersion } = require('./version-helpers');
-
 		const currentVersion = extractVersion(FILES.pluginPHP);
 		if (!silent) {
 			console.log(`Current version: ${currentVersion}`);
@@ -79,7 +82,6 @@ function updateVersion(incrementType = 'patch', silent = false) {
 		updateFileVersion(FILES.packageJSON, currentVersion, newVersion, silent);
 		updateFileVersion(FILES.composerJSON, currentVersion, newVersion, silent);
 		updateFileVersion(FILES.readmeTXT, currentVersion, newVersion, silent);
-		updateFileVersion(FILES.addonPHP, currentVersion, newVersion, silent);
 
 		if (!silent) {
 			console.log('Version updated successfully in all files.');
@@ -106,4 +108,4 @@ const newVersion = updateVersion(incrementType, silent);
 
 console.log(newVersion);
 
-module.exports = newVersion;
+export default newVersion;

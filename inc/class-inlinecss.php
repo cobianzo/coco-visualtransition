@@ -5,14 +5,20 @@
  * This class is responsible to render in the Editor and in the Frontend the
  * CSS and SVG elements to create the Visual Transition effect.
  *
- * @package    VisualTransition
+ * The result looks like this
+ *
+ * <div class="this is the core/group container" data-cocovisualtransitionid="unique-id">
+ * <svg> here the <path> with id="pattern-unique-id" </svg>
+ * <style> [data-cocovisualtransitionid="unique-id"] {  clip-path or mask referring to url(#pattern-unique-id)   } </style>
+ * </div>
+ *
+ * @package    CocoVisualTransition
  * @subpackage InlineCSS
  * @since      1.0.0
  */
 
 namespace COCO\VisualTransition;
 
-use Coco\VisualTransition\SVG_Generator;
 use Coco\VisualTransition\SVG_Generator_Factory;
 
 // Exit if accessed directly
@@ -37,14 +43,15 @@ final class InlineCSS {
 		// For the Frontend.
 		add_filter( 'render_block', [ __CLASS__, 'render_block_with_html_attributes' ], 10, 2 );
 
-		// For the Editor. Rest endpoint handler for generating SVG and CSS on demand.
+		// For the Editor.
+		// REST endpoint handler for generating SVG and CSS on demand.
 		add_action( 'rest_api_init', [ __CLASS__, 'register_rest_route_for_editor_use' ] );
 	}
 
 
 	/**
-	 * Reusable in Frontend and Backend.
-	 * Generate and insert inline CSS and SVG for visual transitions
+	 * Reusable in Frontend and Editor (little variations between each other).
+	 * Generate and insert inline CSS and SVG for visual transition in a core/group block.
 	 *
 	 * @param string                      $pattern The pattern name to generate. ie 'waves'
 	 * @param string                      $id Unique identifier for the transition.
@@ -65,12 +72,27 @@ final class InlineCSS {
 		 * ]
 		 */
 		// The inline css. When used in the editor, we select the div with [data-block], not [data-cocovisualtransitionid]
-		$pattern_id = $generator->get_pattern_id();
+		$pattern_id = $generator->pattern_id;
+		$is_mask    = isset( $generator->pattern_data['type'] ) && 'mask' === $generator->pattern_data['type'];
+
 		ob_start(); ?>
 		<style id="coco-vt-<?php echo esc_attr( $id ); ?>">
 				[data-cocovisualtransitionid="<?php echo esc_attr( $id ); ?>"]{
+
+					<?php
+					if ( ! $is_mask ) :
+						?>
 						clip-path: url(#<?php echo esc_attr( $pattern_id ); ?>);
 						webkit-clip-path: url(#<?php echo esc_attr( $pattern_id ); ?>);
+						<?php
+						else :
+							?>
+						mask: url(#<?php echo esc_attr( $pattern_id ); ?>);
+						-webkit-mask: url(#<?php echo esc_attr( $pattern_id ); ?>);
+							<?php
+						endif;
+						?>
+
 						<?php
 						// We add negative margin to 'merge' the core/block with the previous block on top.
 						// the YOffset actually changes the style.margin-top, so this wouldn't be needed, but it helps to understand.

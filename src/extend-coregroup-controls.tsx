@@ -117,12 +117,10 @@ const newCoreBlock = createHigherOrderComponent(
 										label={__("Negative offset Y (px)", "coco-visualtransition")}
 										value={attributes.YOffset}
 										onChange={(value) => setAttributes({ YOffset: value })}
-										min={-100}
+										min={-150}
 										max={0}
 										step={1}
-										help={ (attributes.YOffset === 0) ?
-											__("Overlap the group with the precendent group by translating it on the Y axis", "coco-visualtransition")
-										: __("You are overwritting the margin top. This commands allows you to assign negative value to it.", "coco-visualtransition") }
+										help={  __("Overlaps the group with the precendent group by translating it on the Y axis. This control overwrites the margin top. It allows you to assign negative value to it. Note that the margin top will change the value to fit this one in pixels", "coco-visualtransition") }
 								/>
 							</>
 						)}
@@ -158,37 +156,41 @@ const usePatternData = (visualTransitionName: string) => {
  * Custom hook.
  * Updates the margin top of the block when YOffset is changed.
  *
- * @param param0
  */
 export function useSyncYOffsetWithMarginTop({ attributes, setAttributes }) {
-	const { YOffset, style = {} } = attributes;
-	const previousYOffset = useRef(YOffset);
-	const previousMarginTop = useRef(style?.spacing?.margin?.top);
+	const { YOffset, style = {} }: { YOffset?: number; style?: { spacing?: { margin?: { top?: string } } } } = attributes;
+	const previousYOffset = useRef<number | undefined>(YOffset);
+	const previousMarginTop = useRef<string | undefined>(style?.spacing?.margin?.top);
 
 	useEffect(() => {
 		const newAttributes: { YOffset?: number; style?: object } = {};
 		const mt = style?.spacing?.margin?.top;
-		if ((mt || mt === 0) && mt !== previousMarginTop.current) {
+		if (mt && mt !== previousMarginTop.current) {
 			newAttributes.YOffset = 0;
 		}
 		if (YOffset !== previousYOffset.current) {
-			previousYOffset.current = YOffset;
 
+			// update the values that we use to know if there is a modification
+			previousYOffset.current = YOffset;
 			previousMarginTop.current = YOffset !== 0 ? `${YOffset}px` : undefined;
 
+			// Update the style
 			const newStyle = {
 				...style,
 				spacing: {
 					...(style?.spacing || {}),
 					margin: {
 						...(style?.spacing?.margin || {}),
-						top: previousMarginTop.current,
+						top: previousMarginTop.current, // <--- this is the update of the margin top with the YOffset px value
 					},
 				},
 			};
 			newAttributes.style = newStyle;
 
 		}
+
+		// Update the attributes
 		setAttributes(newAttributes);
+
 	}, [YOffset, setAttributes, style]);
 }

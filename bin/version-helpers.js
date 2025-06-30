@@ -1,5 +1,5 @@
 // used in version-increment.js
-const fs = require('fs');
+import fs from 'fs';
 
 /**
  * Extract the current version from a file.
@@ -15,4 +15,4 @@ function extractVersion(filePath) {
 	return match[0];
 }
 
-module.exports = { extractVersion };
+export { extractVersion };

@@ -4,7 +4,7 @@
  *
  * From the pattern name and parameters, create the <svg> element to insert inline in the document.
  *
- * @package Coco\VisualTransition
+ * @package CocoVisualTransition
  */
 
 namespace Coco\VisualTransition;
@@ -34,6 +34,14 @@ class SVG_Generator {
 	public string $id;
 
 	/**
+	 * Computed from $id above. It's the id for the <svg><clipPath id="pattern-<id>" or
+	 * <svg><mask id="pattern-<id>" that we reference in the css with clip-path or mask: url(#pattern-<id>)
+	 *
+	 * @var string
+	 */
+	public string $pattern_id;
+
+	/**
 	 * Name of the pattern to be generated
 	 *
 	 * @var string
@@ -41,35 +49,40 @@ class SVG_Generator {
 	public string $pattern_name = 'triangles';
 
 	/**
-	 * Height of the pattern in relative units
+	 * Height of the pattern in relative units. (% per 1)
+	 * Correspnds to `patternHeight` attribute in the block.
+	 * and converts into {y_size} placeholder in the pattern.
 	 *
 	 * @var float
 	 */
 	public float $pattern_height;
 
 	/**
-	 * Width of the pattern in relative units
+	 * Width of the pattern in relative units. (% per 1)
+	 * Correspnds to `patternWidth` attribute in the block.
+	 * and converts into {x_size} placeholder in the pattern.
 	 *
 	 * @var float
 	 */
 	public float $pattern_width;
 
 	/**
-	 * Pattern data loaded from JSON file.
+	 * Pattern data loaded from `src/patterns.json` file.
 	 *
 	 * @var array<string, mixed>
 	 */
-	protected array $pattern_data;
+	public array $pattern_data;
 
 	/**
-	 * These is what matters, the svg and points for the shape.
+	 * Important prop. These is what matters, the svg and points for the shape.
 	 *
 	 * @var string
 	 */
 	public string $points_string;
 
 	/**
-	 * The SVG string representation
+	 * Important prop. The html `<svg ...> </svg>` string representation for the mask.
+	 * We create it from the 'pattern' in 'patterns.json', or we can overwrite it in php.
 	 *
 	 * @var string
 	 */
@@ -85,6 +98,7 @@ class SVG_Generator {
 	public function __construct( string $pattern_name = '', string $id = 'mi-greca', array $atts = [] ) {
 		$this->id           = $id;
 		$this->pattern_name = $pattern_name;
+		$this->pattern_id  = $this->get_pattern_id();
 
 		$this->pattern_data = Generic_Helpers::load_pattern_json( $pattern_name );
 
@@ -94,10 +108,10 @@ class SVG_Generator {
 
 		// the $atts params which customizes the pattern mask.
 		$this->pattern_height = ( isset( $atts['pattern-height'] ) && '' !== $atts['pattern-height'] )
-			? (float) Generic_Helpers::to_float( $atts['pattern-height'] ) : 0.1;
+			? (float) Generic_Helpers::to_float( $atts['pattern-height'] ) : null;
 
 		$this->pattern_width = ( isset( $atts['pattern-width'] ) && '' !== $atts['pattern-width'] )
-			? (float) Generic_Helpers::to_float( $atts['pattern-width'] ) : 0.1;
+			? (float) Generic_Helpers::to_float( $atts['pattern-width'] ) : null;
 
 
 		// these will create the $this->svg_string.
@@ -137,10 +151,6 @@ class SVG_Generator {
 	public function generate_svg(): string {
 		$points = $this->points_string;
 
-		if ( false === strpos( $points, 'Z' ) ) {
-			$points .= 'Z';
-		}
-
 		$extra_attrs = [
 			'style' => 'position:absolute;overflow:hidden;',
 		];
@@ -148,22 +158,41 @@ class SVG_Generator {
 		$is_trajectory_path = SVGPath_Helpers::is_trajectory_path( $points );
 		$shape_string       = $is_trajectory_path ? '<path d="%s" />' : '<polygon points="%s" />';
 		$shape_string       = sprintf( $shape_string, $points );
-		$pattern_id         = $this->get_pattern_id();
 		$extra_attrs_string = array_reduce(
 			array_keys( $extra_attrs ),
 			fn( string $carry, string $attr ) => $carry . ' ' . sprintf( '%s="%s"', $attr, esc_attr( $extra_attrs[ $attr ] ) ),
 			''
 		);
 
-		$this->svg_string = <<<SVG
-<svg width="0" height="0" $extra_attrs_string>
-	<defs>
-		<clipPath id="$pattern_id" clipPathUnits="objectBoundingBox">
-			$shape_string
-		</clipPath>
-	</defs>
-</svg>
-SVG;
+		/**
+		 * IMPORTANT:
+		 *
+		 * HERE is where we create the <svg>, it will be appended right after the div
+		 */
+		if ( ! isset( $this->pattern_data['type'] ) || 'clipPath' === $this->pattern_data['type'] ) {
+			$this->svg_string = <<<SVG
+	<svg width="0" height="0" $extra_attrs_string>
+		<defs>
+			<clipPath id="$this->pattern_id" clipPathUnits="objectBoundingBox">
+				$shape_string
+			</clipPath>
+		</defs>
+	</svg>
+	SVG;
+		} else {
+
+			$shape_string = str_replace( '/>', ' fill="rgba(255,255,255, 1)" />', $shape_string );
+
+			$this->svg_string = <<<SVG
+	<svg width="0" height="0" $extra_attrs_string>
+		<defs>
+			<mask id="$this->pattern_id" maskUnits="objectBoundingBox" maskContentUnits="objectBoundingBox">
+				$shape_string
+			</mask>
+		</defs>
+	</svg>
+	SVG;
+		}
 		return $this->svg_string;
 	}
 
@@ -216,10 +245,11 @@ SVG;
 
 		} while ( $latest_x_point < $end_point_x && $i < 15 );
 
-		$path_string .= ( $is_trajectory ? 'L' : '' ) . " $end_point_x 0";
-		$path_string .= ( $is_trajectory ? 'L' : '' ) . " $end_point_x $end_point_y";
-		$path_string .= ( $is_trajectory ? 'L' : '' ) . " $start_point_x $end_point_y";
-		$path_string .= $is_trajectory ? 'Z' : " $start_point_x 0";
+		// close the path by adding vertex in every corner of the container.
+		$path_string .= ( $is_trajectory ? ' L' : '' ) . " $end_point_x 0";
+		$path_string .= ( $is_trajectory ? ' L' : '' ) . " $end_point_x $end_point_y";
+		$path_string .= ( $is_trajectory ? ' L' : '' ) . " $start_point_x $end_point_y";
+		$path_string .= $is_trajectory ? ' Z' : " $start_point_x 0";
 
 		return $path_string;
 	}

@@ -1,18 +1,17 @@
 TODO
 ===
 
-- Include frontend inline style and svg to show the result of the visualtransition
-- add the option to move the group up to merge with the previous group.
-- Use masks
 - Include option to load the pattern from a svg file.
 - add cache when creating inline css. If already created.
-
 - localization
+- fix phpunit tests and add e2e tests.
+- create a nicer pattern with mask and semitransparency.
+- create option to validate the plugin with my server, so we can create the pro version of the plugin.
 
 WHAT IS THIS PROJECT
 ===
 
-This plugin is meant to add new attributes and contols to the core block core/group. These attributes allow
+This plugin is meant to add new attributes and contols to the core block `core/group`. These attributes allow
 the user to add a visual fret, based on a pattern, to the top of the group container. This fret clips the group container,
 making it "melt" with the previous container.
 

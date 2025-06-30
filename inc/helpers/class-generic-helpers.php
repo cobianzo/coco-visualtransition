@@ -2,7 +2,7 @@
 /**
  * Helper functions for the Visual Transition plugin
  *
- * @package Coco\VisualTransition
+ * @package CocoVisualTransition
  */
 
 namespace Coco\VisualTransition\Helpers;

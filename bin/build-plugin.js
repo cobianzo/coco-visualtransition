@@ -8,10 +8,19 @@
 // eg: node ./bin/build-plugin.js
 // eg: node ./bin/build-plugin.js --skip-compression
 
-const fs = require('fs').promises;
-const fsSync = require('fs');
-const archiver = require('archiver');
-const path = require('path');
+import fs from 'fs';
+import archiver from 'archiver';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import { exec } from 'child_process';
+import { extractVersion } from './version-helpers.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Use fs.promises for async operations and fs for sync operations
+const fsPromises = fs.promises;
+const fsSync = fs;
 
 class PluginBuilder {
 	/**
@@ -39,16 +48,16 @@ class PluginBuilder {
 		this.distDir = 'dist';
 
 		// Lista de archivos y directorios a incluir
-		this.directories = ['inc'];
+		this.directories = ['inc', 'build', 'src'];
 
-    // In this case we also have to include the phpstan - bootstrap .php
-		this.files = [`${this.pluginSlug}.php`, `phpstan-bootstrap.php`, `package.json`];
+    // Including files from the root, keeping their names
+		this.files = [`${this.pluginSlug}.php`, `package.json`];
 		this.files = this.files.map((file) => ({
 			source: file,
 			target: file,
 		}));
 
-		// files that change name from dev > dist: renaming the readme for the plugin.
+		// Including files that change name from dev > dist: renaming the readme for the plugin.
 		this.files.push({
 			source: 'README-plugin.txt',
 			target: 'readme.txt',
@@ -61,8 +70,8 @@ class PluginBuilder {
 
 		for (const file of dsStoreFiles) {
 			try {
-				await fs.access(file);
-				await fs.unlink(file);
+				await fsPromises.access(file);
+				await fsPromises.unlink(file);
 				console.log(`Removed ${file}`);
 			} catch (error) {
 				// Ignoramos errores de archivos que no existen
@@ -78,7 +87,7 @@ class PluginBuilder {
 		// Verificar directorios
 		for (const dir of this.directories) {
 			try {
-				await fs.access(dir);
+				await fsPromises.access(dir);
 			} catch (error) {
 				console.warn(`Warning: Directory '${dir}' not found, skipping...`);
 				// Removemos el directorio de la lista
@@ -89,7 +98,7 @@ class PluginBuilder {
 		// Verificar archivos individuales
 		for (const file of this.files) {
 			try {
-				await fs.access(file.source);
+				await fsPromises.access(file.source);
 			} catch (error) {
 				throw new Error(`Required file '${file.source}' not found!`);
 			}
@@ -99,9 +108,9 @@ class PluginBuilder {
 	// Crea el directorio dist si no existe
 	async createDistDirectory() {
 		try {
-			await fs.access(this.distDir);
+			await fsPromises.access(this.distDir);
 		} catch {
-			await fs.mkdir(this.distDir);
+			await fsPromises.mkdir(this.distDir);
 			console.log(`Created ${this.distDir} directory`);
 		}
 	}
@@ -153,14 +162,14 @@ class PluginBuilder {
 		try {
 			// Crear el directorio destino si no existe
 			if (!fsSync.existsSync(targetDirectory)) {
-				await fs.mkdir(targetDirectory, { recursive: true });
+				await fsPromises.mkdir(targetDirectory, { recursive: true });
 			}
 
 			// Copiar directorios
 			for (const dir of this.directories) {
 				const targetDirPath = path.join(targetDirectory, path.basename(dir));
 				console.log(`Copiando directorio: ${dir} -> ${targetDirPath}`);
-				await fs.cp(dir, targetDirPath, { recursive: true });
+				await fsPromises.cp(dir, targetDirPath, { recursive: true });
 			}
 
 			// Copiar archivos individuales
@@ -168,8 +177,8 @@ class PluginBuilder {
 				const targetFilePath = path.join(targetDirectory, file.target);
 				console.log(`Copiando archivo: ${file.source} -> ${targetFilePath}`);
 				// Crear el directorio del archivo si no existe
-				await fs.mkdir(path.dirname(targetFilePath), { recursive: true });
-				await fs.copyFile(file.source, targetFilePath);
+				await fsPromises.mkdir(path.dirname(targetFilePath), { recursive: true });
+				await fsPromises.copyFile(file.source, targetFilePath);
 			}
 
 			console.log(`Archivos copiados exitosamente a: ${targetDirectory}`);
@@ -210,7 +219,6 @@ async function main() {
 	// Obtener la versión del argumento de línea de comandos (not used anymore, I prefer to extract it.)
 	//  const version = process.argv[2] && !process.argv[2].startsWith('--') ? process.argv[2] : null;
 
-	const { extractVersion } = require('./version-helpers');
 	const version = extractVersion(path.join(__dirname, '../', 'coco-visualtransition.php'));
 
 	const skipCompression = [process.argv[2], process.argv[3]].includes('--skip-compression');
@@ -236,7 +244,6 @@ async function main() {
 
   console.log('Build process completed successfully! Opening folder in 5s');
   setTimeout( () => {
-    const { exec } = require('child_process');
     // Open the /dist folder in Finder (macOS specific)
     exec('open ./dist', (error, stdout, stderr) => { /** I culd handle any error here  */});
   }, 5000);
@@ -244,8 +251,9 @@ async function main() {
 }
 
 // Ejecutar solo si es llamado directamente
-if (require.main === module) {
+// In ES modules, we check if the current file is the main module
+if (import.meta.url === `file://${process.argv[1]}`) {
 	main();
 }
 
-module.exports = PluginBuilder;
+export default PluginBuilder;
