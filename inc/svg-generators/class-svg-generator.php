@@ -55,7 +55,7 @@ class SVG_Generator {
 	 *
 	 * @var float
 	 */
-	public float $pattern_height;
+	public float $pattern_height = 0.0;
 
 	/**
 	 * Width of the pattern in relative units. (% per 1)
@@ -64,7 +64,7 @@ class SVG_Generator {
 	 *
 	 * @var float
 	 */
-	public float $pattern_width;
+	public float $pattern_width = 0.0;
 
 	/**
 	 * Pattern data loaded from `src/patterns.json` file.
@@ -98,7 +98,7 @@ class SVG_Generator {
 	public function __construct( string $pattern_name = '', string $id = 'mi-greca', array $atts = [] ) {
 		$this->id           = $id;
 		$this->pattern_name = $pattern_name;
-		$this->pattern_id  = $this->get_pattern_id();
+		$this->pattern_id   = $this->get_pattern_id();
 
 		$this->pattern_data = Generic_Helpers::load_pattern_json( $pattern_name );
 
@@ -108,10 +108,10 @@ class SVG_Generator {
 
 		// the $atts params which customizes the pattern mask.
 		$this->pattern_height = ( isset( $atts['pattern-height'] ) && '' !== $atts['pattern-height'] )
-			? (float) Generic_Helpers::to_float( $atts['pattern-height'] ) : null;
+			? (float) Generic_Helpers::to_float( $atts['pattern-height'] ) : 0.0;
 
 		$this->pattern_width = ( isset( $atts['pattern-width'] ) && '' !== $atts['pattern-width'] )
-			? (float) Generic_Helpers::to_float( $atts['pattern-width'] ) : null;
+			? (float) Generic_Helpers::to_float( $atts['pattern-width'] ) : 0.0;
 
 
 		// these will create the $this->svg_string.
@@ -219,7 +219,7 @@ class SVG_Generator {
 			: '';
 		$is_trajectory = SVGPath_Helpers::is_trajectory_path( trim( $pattern ) );
 		$pattern_array = false !== $is_trajectory ? $is_trajectory : explode( ',', trim( $pattern ) );
-		$scale         = is_numeric( $this->pattern_data['scale'] ) ? (float) $this->pattern_data['scale'] : 1.0;
+		$scale         = isset( $this->pattern_data['scale'] ) && is_numeric( $this->pattern_data['scale'] ) ? (float) $this->pattern_data['scale'] : 1.0;
 		$start_point_x = 0 - $offset_x;
 		$end_point_x   = 1 + $offset_x;
 		$end_point_y   = 1 + $offset_y;
@@ -243,7 +243,7 @@ class SVG_Generator {
 			$path_string   .= $coordenates_from_pattern;
 			$latest_x_point = SVGPath_Helpers::get_last_x_point( $path_string );
 
-		} while ( $latest_x_point < $end_point_x && $i < 15 );
+		} while ( $latest_x_point < $end_point_x && $i < 100 ); // the $i is just in case we get into infitive loop.
 
 		// close the path by adding vertex in every corner of the container.
 		$path_string .= ( $is_trajectory ? ' L' : '' ) . " $end_point_x 0";

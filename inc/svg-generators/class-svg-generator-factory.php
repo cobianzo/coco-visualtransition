@@ -35,7 +35,10 @@ class SVG_Generator_Factory {
 		switch ( $pattern ) {
 			case 'duomask-slope-1':
 				return new DuoMask_Slope_1( $pattern, $id, $atts );
-				break;
+			case 'duomask-polygon-1':
+				return new DuoMask_Polygon_1( $pattern, $id, $atts );
+			case 'shark-fin':
+				return new Shark_Fin( $pattern, $id, $atts );
 			default:
 				// Generic
 				return new SVG_Generator( $pattern, $id, $atts );

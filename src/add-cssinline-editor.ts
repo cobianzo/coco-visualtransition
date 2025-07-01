@@ -1,4 +1,5 @@
 import apiFetch from '@wordpress/api-fetch';
+import { getEditorCanvas } from './utils';
 
 
 declare global {
@@ -24,44 +25,61 @@ interface PatternAttributes {
  */
 export async function getInlineCssSvg(patternName: string, blockId: string, atts: PatternAttributes): Promise<string> {
 
-	// check the PHP endpoint
-	const css: string = await apiFetch({
-		path: 'coco/v1/vtstyle',
-		method: 'POST',
-		data: {
-			pattern_name: patternName,
-			block_id: blockId,
-			pattern_atts: atts //  ie. { patternHeight: 0.08, patternWidth: 0.2, YOffset: -40}
-		}
-	});
+	try {
+			// check the PHP endpoint
+			const css: string = await apiFetch({
+					path: 'coco/v1/vtstyle',
+					method: 'POST',
+					data: {
+							pattern_name: patternName,
+							block_id: blockId,
+							pattern_atts: atts //  ie. { patternHeight: 0.08, patternWidth: 0.2, YOffset: -40}
+					}
+			});
 
-	return css;
+			if ( ! css || css === '') {
+				throw new Error('Failed to generate visual transition styles');
+			}
+
+			return css;
+	} catch (error) {
+			console.error('Failed to fetch `coco/v1/vtstyle` inline CSS:', error, patternName, blockId, atts);
+			throw new Error('Failed to generate visual transition styles');
+	}
 }
 
 /* delete the style css and the svg that modify the core/block group, given the clientId  */
 export function deleteInlineCss( id ) {
-	const iframe = document.querySelector('iframe');
-	const iframeDocument = iframe?.contentDocument || iframe?.contentWindow?.document;
-	if (!iframeDocument) {
-			console.error('Editor iframe document not found');
+	const gutenbergEditor = getEditorCanvas();
+
+	if (!gutenbergEditor){
 			return;
 	}
 
 	// If the style and svg existed, we delete it
-	iframeDocument.getElementById(getIdContainer(id))?.remove();
+	gutenbergEditor.querySelector(`#${getIdContainer(id)}`)?.remove();
 }
 
+/**
+ * Appends inline CSS and SVG styles to the editor iframe document
+ *
+ * @param {string} id - The unique identifier for the block
+ * @param {string} cssAndSvg - The CSS and SVG markup to be injected
+ * @returns {void} Nothing
+ *
+ *
+ * @example
+ * appendInlineCss('block-123', '<style>.my-style{}</style><svg>...</svg>');
+ */
 export function appendInlineCss( id: string, cssAndSvg: string) {
 
 	// enter in the context of the editor, which is an iframe.
-	const iframe = document.querySelector('iframe');
-	const iframeDocument = iframe?.contentDocument || iframe?.contentWindow?.document;
-	if (!iframeDocument) {
-			console.error('Editor iframe document not found');
-			return;
+	const gutenbergEditor = getEditorCanvas();
+
+	if (!gutenbergEditor) {
+		console.error('Editor iframe document not found. Cant append Inline CSS');
+		return;
 	}
-
-
 	// If the style and svg existed, we delete it
 	deleteInlineCss(id);
 
@@ -71,7 +89,7 @@ export function appendInlineCss( id: string, cssAndSvg: string) {
 	div.innerHTML = cssAndSvg;
 
 	//append the div with the <style> and the <svg>
-	iframeDocument.querySelector('html body')?.appendChild(div);
+	gutenbergEditor.appendChild(div);
 
 }
 

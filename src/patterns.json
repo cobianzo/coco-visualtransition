@@ -26,17 +26,29 @@
     "scale": 100
   },
   {
-    "label": "Slope mask",
-    "value": "slope-mask",
-    "pattern": "L -5.033 7.474 C 15.496 3.269 33.904 1.285 54.586 3.603 C 64.577 4.723 74.742 10.648 84.471 13.26 C 92.802 15.496 103.067 14.696 130.572 16.959",
+    "label": "Slope 2",
+    "value": "slopw-2",
+    "pattern": "L 0 6.136 C 0.138 6.136 8.263 1.566 24.495 1.163 C 40.727 0.76 58.398 2.354 65.03 3.812 C 71.662 5.27 83.403 9.275 90.864 8.261 C 98.325 7.247 105.271 0.688 118.154 1.042",
     "scale": 100,
     "type": "mask"
   },
   {
-    "label": "DuoMask_Slope_1",
-    "value": "duomask-slope-1",
-    "pattern": "L -5.033 7.474 C 15.496 3.269 33.904 1.285 54.586 3.603 C 64.577 4.723 74.742 10.648 84.471 13.26 C 92.802 15.496 103.067 14.696 130.572 16.959",
+    "label": "Shark Fin Mask",
+    "value": "shark-fin",
+    "pattern": "{y_size}",
     "scale": 100,
+    "type": "mask"
+  },
+  {
+    "label": "DuoMask Slope 1",
+    "value": "duomask-slope-1",
+    "pattern": "{y_size} this pattern doesnt matter because its set in php. We need to reference {y_size} so the command height is shoen in the editor.",
+    "type": "mask"
+  },
+  {
+    "label": "DuoMask Polygon 1",
+    "value": "duomask-polygon-1",
+    "pattern": "{y_size} this pattern doesnt matter because its set in php. We need to reference {y_size} so the command height is shoen in the editor.",
     "type": "mask"
   }
 ]

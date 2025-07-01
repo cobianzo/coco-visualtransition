@@ -1,6 +1,6 @@
 {
   "name": "coco-visualtransition",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "Plugin para scraping de carteleras",
   "type": "module",
   "scripts": {
@@ -13,6 +13,7 @@
     "tcli": "wp-env run tests-cli",
     "tbash": "npm run tcli bash",
     "test:php": "wp-env run tests-wordpress --env-cwd='wp-content/plugins/coco-visualtransition' composer run punit",
+    "test:php:single": "wp-env run tests-wordpress --env-cwd='wp-content/plugins/coco-visualtransition' composer run punit tests/HelpersTest.php",
     "test:php:watch": "wp-env run tests-wordpress --env-cwd='wp-content/plugins/coco-visualtransition' composer run punit-watch",
     "test:php:e2e": "npm run test:php tests/E2ETest.php",
     "wpcli": "wp-env run cli wp ",

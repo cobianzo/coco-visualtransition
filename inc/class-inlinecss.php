@@ -59,6 +59,19 @@ final class InlineCSS {
 	 * @return string Generated SVG and CSS styles
 	 */
 	public static function insert_inline_css( string $pattern, string $id, array $atts = [] ): string {
+
+		// cache first:
+		$cache_key = md5(json_encode([
+				'pattern' => $pattern,
+				'id' => $id,
+				'attributes' => $atts
+		]));
+		$svg_and_style = get_transient( 'coco_vt_'. $cache_key );
+		if ( false !== $svg_and_style ) {
+			return $svg_and_style;
+		}
+
+
 		require_once plugin_dir_path( __FILE__ ) . 'svg-generators/class-svg-generator-factory.php';
 
 		$generator = SVG_Generator_Factory::create( $pattern, $id, $atts );
@@ -106,6 +119,9 @@ final class InlineCSS {
 		</style>
 		<?php
 		$css = ob_get_clean();
+
+		// cache:
+		set_transient( 'coco_vt_'. $cache_key, $svg. $css, DAY_IN_SECONDS );
 
 		return $svg . $css;
 	}
@@ -198,21 +214,18 @@ final class InlineCSS {
 
 				/**
 				 * Pattern name from request parameters
-				 *
 				 * @var string $pattern_name
 				 */
 				$pattern_name = $params['pattern_name'];
 
 				/**
 				 * Block identifier from request parameters
-				 *
 				 * @var string $block_id
 				 */
 				$block_id = $params['block_id'];
 
 				/**
 				 * Pattern attributes with height settings
-				 *
 				 * @var array<string, string|float> $pattern_attrs
 				 */
 				$pattern_attrs = isset( $params['pattern_atts'] ) ? (array) $params['pattern_atts'] : [];

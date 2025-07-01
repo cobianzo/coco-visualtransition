@@ -1,12 +1,18 @@
 TODO
 ===
 
-- Include option to load the pattern from a svg file.
-- add cache when creating inline css. If already created.
+- Make it work with group sections (problems so far)
+- Fix small warnings from Plugin check.
+- performance with masks is low. We can try to find alternatives using pseudoselectos to add two masks effects.
+- Add z-index 1 and see if it works.
+- Add option to change height in mobile
+- add cache when creating inline css. If params are the same, result shoudl be the same.
 - localization
 - fix phpunit tests and add e2e tests.
 - create a nicer pattern with mask and semitransparency.
 - create option to validate the plugin with my server, so we can create the pro version of the plugin.
+- setup eslint for the whole project, and format all ts.
+- Nice-to-have: Include option to load the pattern from a svg file.
 
 WHAT IS THIS PROJECT
 ===
@@ -35,7 +41,7 @@ There are different ways to define a visual transition:
 
 TO ADD NEW PATTERNS
 ===
-- Use an SVG editor, like Boxy https://boxy-svg.com/app .
+- Use an SVG editor, like Boxy https://boxy-svg.com/app
 - Set viewBox to 0 0 100 100.
 - Create an horizontal line, from 0 to 100 in the x axis.
 - Copy and paste the shape in your VSCode editor.
@@ -43,7 +49,18 @@ TO ADD NEW PATTERNS
 - Better if the right edge x arrives to 120, so it compensate that the mask has negative x boundaries.
 - Copy the path points into the key 'pattern' in `patterns.json`.
 - Set the key 'scale' to 100.
-- If you want, you can use the placeholders {x_size} and {y_size}, and even{2*x_size}.}
+- If you want, you can use the placeholders {x_size} and {y_size}, and even{2*x_size} in the pattern.
+
+## TO ADD A MORE CUSTOMIZED NEW PATTERN (several masks with transparencias)
+
+- For more control on the pattern, you can create your own SVG with more complex mask paths, including more than one.
+- See the example of the duomask-slope-1.
+- In this case the SVG is created totally in the PHP, so we can add more than one path.
+- Create a new key in `patterns.json`, and set the key 'type' to 'custom'.
+- Create a new class in inc/svg-generators/custom-patterns/
+- Reference this new class in `inc/svg-generators/class-svg-generator-factory.php`.
+- Overwrite the method generate_svg, and return the svg code.
+- follow inc/svg-generators/custom-patterns/class-duomask-slope-1.php as an example.
 
 DEVELOPMENT
 ===
@@ -157,7 +174,7 @@ Then we can access locally o inside the container to wp-content/plugins/coco-vis
 # Useful tools to develop shapes
 
 Helps to design the path
-https://codepen.io/anthonydugois/pen/mewdyZ
+https://boxy-svg.com/app
 
 Helps to undesrstand every point of the path.
 https://svg-path-visualizer.netlify.app/

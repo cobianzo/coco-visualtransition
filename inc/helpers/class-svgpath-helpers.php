@@ -19,9 +19,13 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 final class SVGPath_Helpers {
 
+	const TRAJECTORY_PATH_VALID_CHARS = 'MmLlHhVvzCcSsQqTtAa';
+
 
 	/**
 	 * Identifies format M -5.033 7.474 C 15.496 3.269 33.904 1.285 54.586 3.603  respect -0.1 0, 0.07 0, 0.07 0.16,
+	 * If it's format with 'M', 'C' ... it transform every vertex info into an item of an array.
+	 * ie [ 'M 5 4', 'C 5.5 4.0 5.2 3.3 5.6 3.3', ... ]
 	 *
 	 * @param string $string_path The path string to analyze for trajectory format.
 	 * @return array<int, string>|false Returns array of path commands if valid trajectory, false otherwise.
@@ -39,11 +43,10 @@ final class SVGPath_Helpers {
 			$string_path = str_replace( '{' . $placeholder_name . '}', '{' . $placeholder_id . '}', $string_path );
 		}
 
-		$trajectory_path_chars = 'MmLlHhVvzCcSsQqTtAa';
-		$is_trajectory_path    = preg_match( '/[' . $trajectory_path_chars . ']/', $string_path );
+		$is_trajectory_path = preg_match( '/[' . self::TRAJECTORY_PATH_VALID_CHARS . ']/', $string_path );
 
 		if ( $is_trajectory_path ) {
-			$pattern = '/([' . preg_quote( $trajectory_path_chars, '/' ) . '])([^' . preg_quote( $trajectory_path_chars, '/' ) . ']*)/';
+			$pattern = '/([' . preg_quote( self::TRAJECTORY_PATH_VALID_CHARS, '/' ) . '])([^' . preg_quote( self::TRAJECTORY_PATH_VALID_CHARS, '/' ) . ']*)/';
 
 			preg_match_all( $pattern, $string_path, $matches, PREG_SET_ORDER );
 
@@ -88,49 +91,149 @@ final class SVGPath_Helpers {
 	 */
 	public static function replace_points_placeholders( string $points_string, float $base_x_coord = 0.0, array $param_values = [] ): string {
 		// Sanitize points string by removing double spaces
-		$points_string = preg_replace( '/\s+/', ' ', trim( (string) $points_string ) );
-		$scale         = $param_values['scale'] ?? 1.0;
+		$points_string = self::sanitize_string_path( $points_string );
+		if ( null === $points_string ) {
+			return '';
+		}
+		$scale = $param_values['scale'] ?? 1.0;
 
-		// separate every coordenate
-		$points_array      = explode( ' ', trim( (string) $points_string ) );
-		$is_x              = true; // we examinate every coordenate identifying if its X coord or Y (or it can be a letter)
-		$new_points_string = '';
-
-		foreach ( $points_array as $coordenate ) {
+		// =======
+		$fn_transform_any_coordenate = function ( string|float $coordenate ) use ( $scale, $param_values ) {
+			$coordenate = (string) $coordenate;
 			foreach ( $param_values as $param_name => $param_value ) {
 				$param_value_str = (string) ( $param_value * $scale );
 				$coordenate      = str_replace( "{{$param_name}}", $param_value_str, $coordenate );
 				$coordenate      = str_replace( "{2*$param_name}", (string) ( 2 * $param_value * $scale ), $coordenate );
 			}
-
-			if ( is_numeric( $coordenate ) ) {
-				$coordenate_float = (float) $coordenate / $scale;
-
-				// Important. We are repeating the pattern over the X axis, so we need to shift the X coordenates
-				// based on where this pattern starts in X.
-				if ( $is_x ) {
-					$coordenate_float += $base_x_coord;
-				}
-
-				$coordenate = (string) $coordenate_float;
-				$is_x       = ! $is_x;
-			}
-
-			$new_points_string .= ( strlen( $new_points_string ) ? ' ' : '' ) . $coordenate;
-		}
+			$coordenate_float = (float) $coordenate / $scale;
+			return (string) $coordenate_float;
+		};
+		// =======
+		$fn_transform_x_coordenate = function ( string|float $coordenate ) use ( $base_x_coord, $fn_transform_any_coordenate ) {
+			$coordenate       = $fn_transform_any_coordenate( $coordenate );
+			$coordenate_float = (float) $coordenate + $base_x_coord;
+			return $coordenate_float;
+		};
+		// =======
+		$new_points_string = self::apply_transform_to_path_coordenates(
+			$points_string,
+			$fn_transform_x_coordenate,
+			$fn_transform_any_coordenate
+		);
 
 		return $new_points_string;
 	}
 
-		/**
-		 * Helper.
-		 * From a set of points as a string in $this->points_string or the arg, ie ( 0 0, 1 1, 2 0, 3 1, 4 0 ).
-		 * returns the last x point. (in this case (int) 4)
-		 *
-		 * @param string $string_points The points string to extract the last x coordinate from.
-		 * @return float The last x coordinate value.
-		 */
+
+	/**
+	 * Using callbacks fns, applies transformation to x and y coordinates in an SVG path string.
+	 *
+	 * Takes a path string containing coordinates and applies separate transformation functions
+	 * to the x and y coordinates. Works with both trajectory paths (using commands like M, L, C)
+	 * and polygon paths (simple coordinate pairs).
+	 *
+	 * @param string   $points_string      The SVG path string containing coordinates to transform
+	 * @param callable $transform_points_x_fn  Function to transform x coordinates
+	 * @param callable $transform_points_y_fn  Function to transform y coordinates
+	 * @return string                      The transformed path string with updated coordinates
+	 */
+	public static function apply_transform_to_path_coordenates( string $points_string, callable $transform_points_x_fn, callable $transform_points_y_fn ): string {
+		if ( empty( $points_string ) ) {
+			return '';
+		}
+
+		$array_coordenates = self::is_trajectory_path( $points_string );
+		if ( ! is_array( $array_coordenates ) ) { // it's a poligon path set as couple of coords
+			$array_coordenates = self::convert_points_to_pairs( $points_string );
+		}
+
+		// now every item in $array_coordenates is a coordenate, set by a string of several X and Ys. Can start by a letter.
+
+		$is_x = true;
+		foreach ( $array_coordenates as $i => $coordenates ) { // $coordenates looks like : 'C 4 3 2 3 4 5' or '34 22'
+			$array_points = explode( ' ', $coordenates );
+			foreach ( $array_points as $j => $coordenate ) { // for every number
+
+				// case the coordenate is not a coordenate, but ie the 'C' in 'C 34 22 35 10  ...'
+				if ( 1 === strlen( $coordenate ) && str_contains( self::TRAJECTORY_PATH_VALID_CHARS, $coordenate ) ) {
+					continue;
+				}
+
+
+				if ( 'Z' === $coordenate ) {
+					continue;
+				}
+
+				if ( $is_x ) {
+					$coordenate = $transform_points_x_fn( $coordenate );
+				} else {
+					$coordenate = $transform_points_y_fn( $coordenate );
+				}
+				$is_x = ! $is_x;
+
+				// update the array with the tansformed coordenate.
+				$array_points[ $j ] = $coordenate;
+			} // end evaluating points for a vertex
+
+			// re-glue all coords and letters back again int o string.
+			$array_coordenates[ $i ] = implode( ' ', $array_points );
+		}
+
+		return implode( ' ', $array_coordenates );
+	}
+
+
+	/**
+	 * Converts a string of coordinate pairs into an array of coordinate pairs.
+	 * Each pair consists of an x and y coordinate separated by spaces.
+	 *
+	 * @param string $points_string String containing coordinate pairs
+	 * @return array<int,string> Array of coordinate pair strings
+	 */
+	private static function convert_points_to_pairs( string $points_string ): array {
+		if ( empty( $points_string ) ) {
+			return [];
+		}
+
+		// Cleanup double spaces
+		$points_string = self::sanitize_string_path( $points_string );
+
+		// Split into individual coordinates
+		$points_array = preg_split( '/[,\s]+/', $points_string );
+		if ( ! is_array( $points_array ) ) {
+			return [];
+		}
+
+		$array_coordinates = [];
+		$points            = '';
+		$is_x              = true;
+
+		// Group coordinates into pairs
+		foreach ( $points_array as $point ) {
+			$points .= ( strlen( $points ) ? ' ' : '' ) . $point;
+			if ( ! $is_x ) {
+				$array_coordinates[] = $points;
+				$points              = '';
+			}
+			$is_x = ! $is_x;
+		}
+
+		return $array_coordinates;
+	}
+
+	/**
+	 * Helper.
+	 * From a set of points as a string in $this->points_string or the arg, ie ( 0 0, 1 1, 2 0, 3 1, 4 0 ).
+	 * returns the last x point. (in this case (int) 4)
+	 *
+	 * @param string $string_points The points string to extract the last x coordinate from.
+	 * @return float The last x coordinate value.
+	 */
 	public static function get_last_x_point( string $string_points ): float {
+		if ( empty( $string_points ) ) {
+			return 0.0;
+		}
+
 		$points = preg_split( '/[,\s]+/', trim( $string_points ) );
 		if ( ! is_array( $points ) ) {
 			return 0.0;
@@ -162,5 +265,26 @@ final class SVGPath_Helpers {
 			return floatval( $x_y[ $count - 1 ] );
 		}
 		return 0.0;
+	}
+
+	public static function close_path( string $path_points, float $scale = 1, float $offset_y = 0.1, float $offset_x = 0.1 ): string {
+		$path_points = self::sanitize_string_path( $path_points );
+		$path = $path_points;
+		if ( ! str_starts_with ( trim($path_points), 'M')) {
+				$path = 'M ' . ( -1 * $offset_x ) . ' 0 ' . $path_points;
+		}
+
+		$path .= ' L '. ( 1 * $scale + $offset_x ).' 0 '  // top right
+			. ' L '. ( 1 * $scale + $offset_x ).' '. ( 1 * $scale + $offset_y )  // bottom right
+			. ' L '. ( -1 * $offset_x ).' '. ( 1 * $scale + $offset_y ).' Z'; // bottom left
+
+		return $path;
+	}
+
+	public static function sanitize_string_path( $path ) {
+		// remove double strings.
+		$path = preg_replace( '/\s+/',' ', $path );
+		$path = trim( $path );
+		return $path;
 	}
 }

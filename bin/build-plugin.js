@@ -66,7 +66,7 @@ class PluginBuilder {
 
 	// Limpia archivos .DS_Store que pueden causar problemas
 	async cleanDsStoreFiles() {
-		const dsStoreFiles = ['build/.DS_Store', '.DS_Store'];
+		const dsStoreFiles = ['build/.DS_Store', '.DS_Store', 'src/.DS_Store'];
 
 		for (const file of dsStoreFiles) {
 			try {

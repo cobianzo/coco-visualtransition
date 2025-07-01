@@ -51,15 +51,6 @@ class Admin_Enqueue {
 				'nonce' => wp_create_nonce( 'coco_visual_transition_nonce' ),
 			]
 		);
-
-
-		// The css. editor. Loads all the styles (TODO: inefficient, we showld load them dynamically only when needed).
-		wp_enqueue_style(
-			'coco-visualtransition-group-block-editor',
-			plugins_url( '/build/index.css', __DIR__ ),
-			[],
-			$asset_file['version']
-		);
 	}
 }
 

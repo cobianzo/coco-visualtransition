@@ -9,7 +9,7 @@
 
 	<testsuites>
 		<testsuite name="Single">
-			<file>tests/GenerateSVGTest.php</file>
+			<file>tests/HelpersTest.php</file>
 		</testsuite>
 
 		<testsuite name="All">
