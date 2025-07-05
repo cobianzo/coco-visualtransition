@@ -6,7 +6,7 @@ import { useState, useEffect, useRef } from "@wordpress/element";
 import { addFilter } from "@wordpress/hooks";
 import { createHigherOrderComponent } from "@wordpress/compose";
 import { InspectorControls } from "@wordpress/block-editor";
-import { PanelBody, CheckboxControl, SelectControl, RangeControl } from "@wordpress/components";
+import { PanelBody, CheckboxControl, SelectControl, RangeControl, Notice } from "@wordpress/components";
 import { Fragment } from "@wordpress/element";
 import { __ } from "@wordpress/i18n";
 
@@ -15,15 +15,18 @@ import patterns from './patterns.json';
 import { getInlineCssSvg, appendInlineCss, deleteInlineCss } from './add-cssinline-editor';
 
 // Types
-import { BlockEditProps } from "@wordpress/block-editor";
 interface CustomAttributes {
 	visualTransitionName?: string;
+	tagName?: string;
+	patternHeight?: number;
+	patternWidth?: number;
+	YOffset?: number;
 }
 
 // Crear componente HOC para extender el panel de Inspector
 const newCoreBlock = createHigherOrderComponent(
-	(BlockEdit: BlockEditProps<CustomAttributes>) =>
-		(props: BlockEditProps<CustomAttributes>) => {
+	(BlockEdit) =>
+		(props) => {
 
 		if (props.name !== "core/group") {
 			return <BlockEdit {...props} />;
@@ -31,7 +34,10 @@ const newCoreBlock = createHigherOrderComponent(
 
 		// init variables for the controls
 		const { attributes, setAttributes } = props;
-		const { visualTransitionName } = attributes;
+		const { visualTransitionName, tagName = 'div' } = attributes;
+
+		// Check if tagName is different from 'div'
+		const isTagNameDiv = tagName === 'div';
 
 		// internal state for checkbox
 		const [checkBoxOn, setCheckBoxOn] = useState(
@@ -52,7 +58,7 @@ const newCoreBlock = createHigherOrderComponent(
 		useEffect( () => {
 
 			const patternName = props.attributes.visualTransitionName;
-			if (checkBoxOn && patternName.length) {
+			if (checkBoxOn && patternName && patternName.length && isTagNameDiv) {
 				getInlineCssSvg(patternName, props.clientId, props.attributes).then( (inlineCSSandSVG: string) => {
 					/**
 					 * adds <div id="" >
@@ -67,21 +73,29 @@ const newCoreBlock = createHigherOrderComponent(
 			}
 
 
-		}, [props.attributes, checkBoxOn, visualTransitionName, props.clientId]); // WATCH changes in attrs.
+		}, [props.attributes, checkBoxOn, visualTransitionName, props.clientId, isTagNameDiv]); // WATCH changes in attrs.
 
 		return (
 			<Fragment>
 				<BlockEdit {...props} />
 				<InspectorControls __experimentalGroup="styles">
 					<PanelBody title="Visual Transition" initialOpen={true}>
+						{!isTagNameDiv && (
+							<Notice status="warning" isDismissible={false}>
+								{__("Visual transitions are only available when the Group block uses a 'div' element. Current tag: ", "coco-visualtransition")}
+								<code>{tagName}</code>
+							</Notice>
+						)}
+
 						<CheckboxControl
 							label={__("Enable Visual Transition", "coco-visualtransition")}
 							checked={checkBoxOn}
+							disabled={!isTagNameDiv}
 							onChange={(value: boolean) => setCheckBoxOn(value)
 							}
 						/>
 
-						{checkBoxOn && (
+						{checkBoxOn && isTagNameDiv && (
 							<>
 								<SelectControl
 									label={__("Select Transition Effect", "coco-visualtransition")}
@@ -157,7 +171,7 @@ const usePatternData = (visualTransitionName: string) => {
  * Updates the margin top of the block when YOffset is changed.
  *
  */
-export function useSyncYOffsetWithMarginTop({ attributes, setAttributes }) {
+export function useSyncYOffsetWithMarginTop({ attributes, setAttributes }: { attributes: CustomAttributes; setAttributes: (attributes: Partial<CustomAttributes>) => void }) {
 	const { YOffset, style = {} }: { YOffset?: number; style?: { spacing?: { margin?: { top?: string } } } } = attributes;
 	const previousYOffset = useRef<number | undefined>(YOffset);
 	const previousMarginTop = useRef<string | undefined>(style?.spacing?.margin?.top);
