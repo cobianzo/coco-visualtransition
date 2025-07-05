@@ -91,11 +91,12 @@ final class SVGPath_Helpers {
 	 */
 	public static function replace_points_placeholders( string $points_string, float $base_x_coord = 0.0, array $param_values = [] ): string {
 		// Sanitize points string by removing double spaces
-		$points_string = self::sanitize_string_path( $points_string );
-		if ( null === $points_string ) {
+		$sanitized_points = self::sanitize_string_path( $points_string );
+		if ( $sanitized_points === null ) {
 			return '';
 		}
-		$scale = $param_values['scale'] ?? 1.0;
+		$points_string = $sanitized_points;
+		$scale         = $param_values['scale'] ?? 1.0;
 
 		// =======
 		$fn_transform_any_coordenate = function ( string|float $coordenate ) use ( $scale, $param_values ) {
@@ -196,7 +197,11 @@ final class SVGPath_Helpers {
 		}
 
 		// Cleanup double spaces
-		$points_string = self::sanitize_string_path( $points_string );
+		$sanitized_points = self::sanitize_string_path( $points_string );
+		if ( $sanitized_points === null ) {
+			return [];
+		}
+		$points_string = $sanitized_points;
 
 		// Split into individual coordinates
 		$points_array = preg_split( '/[,\s]+/', $points_string );
@@ -267,24 +272,56 @@ final class SVGPath_Helpers {
 		return 0.0;
 	}
 
+	/**
+	 * Closes an SVG path by adding connecting lines to form a complete shape.
+	 *
+	 * This function takes an existing SVG path and extends it to create a closed shape
+	 * by adding lines that connect to form a rectangle. If the path doesn't start with
+	 * a move command (M), it prepends a move command to the beginning.
+	 *
+	 * The function creates a rectangular closure by adding:
+	 * - A line to the top-right corner
+	 * - A line to the bottom-right corner
+	 * - A line to the bottom-left corner
+	 * - A close path command (Z)
+	 *
+	 * @param string $path_points The SVG path string to close
+	 * @param float  $scale       Scale factor for the path dimensions (default: 1.0)
+	 * @param float  $offset_y    Vertical offset for the closing rectangle (default: 0.1)
+	 * @param float  $offset_x    Horizontal offset for the closing rectangle (default: 0.1)
+	 * @return string The closed SVG path string, or empty string if path is invalid
+	 */
 	public static function close_path( string $path_points, float $scale = 1, float $offset_y = 0.1, float $offset_x = 0.1 ): string {
-		$path_points = self::sanitize_string_path( $path_points );
-		$path = $path_points;
-		if ( ! str_starts_with ( trim($path_points), 'M')) {
+		$sanitized_path = self::sanitize_string_path( $path_points );
+		if ( $sanitized_path === null ) {
+			return '';
+		}
+		$path_points = $sanitized_path;
+		$path        = $path_points;
+		if ( ! str_starts_with( trim( $path_points ), 'M' ) ) {
 				$path = 'M ' . ( -1 * $offset_x ) . ' 0 ' . $path_points;
 		}
 
-		$path .= ' L '. ( 1 * $scale + $offset_x ).' 0 '  // top right
-			. ' L '. ( 1 * $scale + $offset_x ).' '. ( 1 * $scale + $offset_y )  // bottom right
-			. ' L '. ( -1 * $offset_x ).' '. ( 1 * $scale + $offset_y ).' Z'; // bottom left
+		$path .= ' L ' . ( 1 * $scale + $offset_x ) . ' 0 '  // top right
+			. ' L ' . ( 1 * $scale + $offset_x ) . ' ' . ( 1 * $scale + $offset_y )  // bottom right
+			. ' L ' . ( -1 * $offset_x ) . ' ' . ( 1 * $scale + $offset_y ) . ' Z'; // bottom left
 
 		return $path;
 	}
 
-	public static function sanitize_string_path( $path ) {
+	/**
+	 * Sanitizes a string path by removing extra whitespace.
+	 *
+	 * @param string|null $path The path string to sanitize
+	 * @return string|null The sanitized path string or null if input is null
+	 */
+	public static function sanitize_string_path( ?string $path ): ?string {
+		if ( $path === null ) {
+			return null;
+		}
 		// remove double strings.
-		$path = preg_replace( '/\s+/',' ', $path );
-		$path = trim( $path );
+		$path = preg_replace( '/\s+/', ' ', $path );
+		$path = trim( $path ?? '' );
 		return $path;
 	}
 }

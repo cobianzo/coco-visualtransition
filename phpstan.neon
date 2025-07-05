@@ -9,5 +9,14 @@ parameters:
     - */vendor/*
     - */node_modules/*
 
+  ignoreErrors:
+    -
+      identifier: variable.undefined
+      path: inc/templates/css-template.php
+    -
+      identifier: argument.type
+      path: inc/templates/css-template.php
+
+
   inferPrivatePropertyTypeFromConstructor: true
   reportUnmatchedIgnoredErrors: false

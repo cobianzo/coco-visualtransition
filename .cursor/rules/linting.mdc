@@ -1,0 +1,15 @@
+---
+description: Linting that should compliant every time we commit changes.
+alwaysApply: false
+---
+---
+description: All linting rules that should be compliant every time we save the project.
+globs:
+alwaysApply: false
+---
+- In terminal, We should run eslint `npm run lint` and not receive errors, for .js, .tx, files.
+- In terminal, We can run eslint formatting with `npm run lint:fix` to help fix the easy errors.
+- In terminal, We should run phpcs `composer run-script lint .` without errors, for php files.
+- In terminal, We can run phpcbf `composer run-script format .` to fix the easy errors.
+- If, after a few attemps, we can't fix the errors, then consider using phpcs:ignore comments, or phpcs:disable comments. And in that case you should warn about it and ask before proceeding.
+- In terminal, We should run phpstan with `composer run-script analyze .` without errors, for php files.

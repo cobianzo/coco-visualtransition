@@ -61,16 +61,14 @@ final class InlineCSS {
 	public static function insert_inline_css( string $pattern, string $id, array $atts = [] ): string {
 
 		// cache first:
-		$cache_key = md5(json_encode([
-				'pattern' => $pattern,
-				'id' => $id,
-				'attributes' => $atts
-		]));
-		$svg_and_style = get_transient( 'coco_vt_'. $cache_key );
-		if ( false !== $svg_and_style ) {
-			return $svg_and_style;
+		$cache_data     = compact( 'pattern', 'id', 'atts' );
+		$cache_key_hash = md5( (string) wp_json_encode( $cache_data ) );
+		$svg_and_style  = get_transient( 'coco_vt_' . $cache_key_hash );
+		if ( ! empty( $svg_and_style ) ) {
+			return is_string( $svg_and_style ) ? $svg_and_style : '';
 		}
 
+		// not using cache, genuine generation:
 
 		require_once plugin_dir_path( __FILE__ ) . 'svg-generators/class-svg-generator-factory.php';
 
@@ -88,40 +86,13 @@ final class InlineCSS {
 		$pattern_id = $generator->pattern_id;
 		$is_mask    = isset( $generator->pattern_data['type'] ) && 'mask' === $generator->pattern_data['type'];
 
-		ob_start(); ?>
-		<style id="coco-vt-<?php echo esc_attr( $id ); ?>">
-				[data-cocovisualtransitionid="<?php echo esc_attr( $id ); ?>"]{
-
-					<?php
-					if ( ! $is_mask ) :
-						?>
-						clip-path: url(#<?php echo esc_attr( $pattern_id ); ?>);
-						webkit-clip-path: url(#<?php echo esc_attr( $pattern_id ); ?>);
-						<?php
-						else :
-							?>
-						mask: url(#<?php echo esc_attr( $pattern_id ); ?>);
-						-webkit-mask: url(#<?php echo esc_attr( $pattern_id ); ?>);
-							<?php
-						endif;
-						?>
-
-						<?php
-						// We add negative margin to 'merge' the core/block with the previous block on top.
-						// the YOffset actually changes the style.margin-top, so this wouldn't be needed, but it helps to understand.
-						if ( ! empty( $atts['y-offset'] ) ) :
-							?>
-						margin-top: <?php echo esc_html( (string) $atts['y-offset'] ); ?>px;
-							<?php
-						endif;
-						?>
-				}
-		</style>
-		<?php
+		// Include and use the CSS template
+		ob_start();
+		include plugin_dir_path( __FILE__ ) . 'templates/css-template.php';
 		$css = ob_get_clean();
 
 		// cache:
-		set_transient( 'coco_vt_'. $cache_key, $svg. $css, DAY_IN_SECONDS );
+		set_transient( 'coco_vt_' . $cache_key_hash, $svg . $css, \DAY_IN_SECONDS );
 
 		return $svg . $css;
 	}
@@ -214,18 +185,21 @@ final class InlineCSS {
 
 				/**
 				 * Pattern name from request parameters
+				 *
 				 * @var string $pattern_name
 				 */
 				$pattern_name = $params['pattern_name'];
 
 				/**
 				 * Block identifier from request parameters
+				 *
 				 * @var string $block_id
 				 */
 				$block_id = $params['block_id'];
 
 				/**
 				 * Pattern attributes with height settings
+				 *
 				 * @var array<string, string|float> $pattern_attrs
 				 */
 				$pattern_attrs = isset( $params['pattern_atts'] ) ? (array) $params['pattern_atts'] : [];
