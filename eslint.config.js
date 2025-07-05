@@ -17,7 +17,7 @@ export default [
                 Object.entries(globals.browser)
                     .filter(([key]) => key.trim() === key)
                     .concat([['AudioWorkletGlobalScope', globals.browser['AudioWorkletGlobalScope ']]])
-            )
+            ),
         },
         rules: {
             'react/react-in-jsx-scope': 'off',
@@ -40,7 +40,7 @@ export default [
         },
     },
     {
-        ignores: ['vendor', 'node_modules', 'public', 'bootstrap/ssr', 'tailwind.config.js', 'playwright-report'],
+        ignores: ['vendor', 'node_modules', 'public', 'bootstrap/ssr', 'playwright-report'],
     },
     prettier, // Turn off all rules that might conflict with Prettier
 ];

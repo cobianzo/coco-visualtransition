@@ -11,7 +11,7 @@ TODO
 - fix phpunit tests and add e2e tests.
 - create a nicer pattern with mask and semitransparency.
 - create option to validate the plugin with my server, so we can create the pro version of the plugin.
-- setup eslint for the whole project, and format all ts.
+- Eslint doesnt apply prettier formatting (ie, if a line doesnt end with semicolon, it doest detect the error, and doesnt add it on save)
 - Nice-to-have: Include option to load the pattern from a svg file.
 
 WHAT IS THIS PROJECT

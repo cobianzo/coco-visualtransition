@@ -4,8 +4,8 @@
 	"singleAttributePerLine": false,
 	"htmlWhitespaceSensitivity": "css",
 	"printWidth": 150,
-	"plugins": ["prettier-plugin-organize-imports", "prettier-plugin-tailwindcss"],
-	"tailwindFunctions": ["clsx", "cn"],
+	"trailingComma": "es5",
+	"plugins": ["prettier-plugin-organize-imports"],
 	"tabWidth": 4,
 	"overrides": [
 			{
