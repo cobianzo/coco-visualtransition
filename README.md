@@ -7,7 +7,7 @@ TODO
 - Add option to change height in mobile or disable the visual transition in mobile at least
 - add cache when creating inline css. If params are the same, result shoudl be the same.
 - localization
-- fix phpunit tests and add e2e tests.
+- add e2e tests and more phpunit tests.
 - create option to validate the plugin with my server, so we can create the pro version of the plugin.
 - Eslint doesnt apply prettier formatting (ie, if a line doesnt end with semicolon, it doest detect the error, and doesnt add it on save)
 - Nice-to-have: Include option to load the pattern from a svg file.

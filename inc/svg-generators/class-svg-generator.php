@@ -94,8 +94,15 @@ class SVG_Generator {
 	 * @param string               $pattern_name ie trianges, waves, squares ...
 	 * @param string               $id something like vt_d0c75d9c-98fd-4f10-acec-bb95921d8211
 	 * @param array<string, mixed> $atts parameters to build the shape of the mask, like height of the fret in percentage.
+	 * @throws \InvalidArgumentException If pattern_name or id is empty or contains only whitespace.
 	 */
 	public function __construct( string $pattern_name = '', string $id = 'mi-greca', array $atts = [] ) {
+
+		// Validate pattern_name
+		if ( empty( trim( $pattern_name ) ) || empty( trim( $id ) ) ) {
+			throw new \InvalidArgumentException( 'Args cannot be empty or contain only whitespace.' );
+		}
+
 		$this->id           = $id;
 		$this->pattern_name = $pattern_name;
 		$this->pattern_id   = $this->get_pattern_id();
@@ -204,9 +211,11 @@ class SVG_Generator {
 
 	/**
 	 * Generates points string from pattern by repeating it horizontally.
+	 * It returns coordenates always in % per 1.
+	 * It can accept pattern coordenates in % per 100  (as long as $this->scale is 100)
 	 *
-	 * @param float $offset_x The horizontal offset to apply to the pattern.
-	 * @param float $offset_y The vertical offset to apply to the pattern.
+	 * @param float $offset_x The horizontal offset to apply to the pattern in % per 1.
+	 * @param float $offset_y The vertical offset to apply to the pattern  in % per 1..
 	 * @return string The generated points string for the SVG shape.
 	 */
 	public function generate_points_string_from_pattern( float $offset_x = 0, float $offset_y = 0.1 ): string {
@@ -223,6 +232,8 @@ class SVG_Generator {
 		$path_string = ( $is_trajectory ? 'M ' : '' ) . "$start_point_x 0";
 		$x_size      = $this->pattern_width;
 
+		// $path_string building on every iteration.
+		// we add one set of the 'pattern' on every iteration.
 		$i = 0;
 		do {
 			$i++;

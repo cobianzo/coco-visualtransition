@@ -21,10 +21,15 @@ class SVG_Generator_Factory {
 	 * @param string              $pattern The pattern type to generate.
 	 * @param string              $id      The unique identifier for the SVG.
 	 * @param array<string,mixed> $atts Optional attributes for the SVG generator.
-	 * @throws \Exception If invalid generator type is provided.
+	 * @throws \InvalidArgumentException If pattern or id is empty or invalid.
 	 * @return SVG_Generator Instance of the requested SVG generator.
 	 */
 	public static function create( string $pattern, string $id, array $atts = [] ): SVG_Generator {
+
+		// Validate pattern and id before processing
+		if ( empty( trim( $pattern ) ) || empty( trim( $id ) ) ) {
+			throw new \InvalidArgumentException( 'Pattern and ID cannot be empty or contain only whitespace.' );
+		}
 
 		$file_path = plugin_dir_path( __FILE__ ) . "custom-patterns/class-$pattern.php";
 		if ( file_exists( $file_path ) ) {

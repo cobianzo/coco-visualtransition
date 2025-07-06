@@ -9,7 +9,7 @@ use Coco\VisualTransition\Helpers\SVGPath_Helpers;
 
 /**
  * usage
- * npm run test:php tests/HelpersTest.php
+ * npm run test:php tests/Unit/HelpersTest.php
  * or
  * npm run test:php:single
  */

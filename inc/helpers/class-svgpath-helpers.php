@@ -98,7 +98,7 @@ final class SVGPath_Helpers {
 		$points_string = $sanitized_points;
 		$scale         = $param_values['scale'] ?? 1.0;
 
-		// =======
+		// ======= transform function for X and Y coords (placeholder replacements and scale):
 		$fn_transform_any_coordenate = function ( string|float $coordenate ) use ( $scale, $param_values ) {
 			$coordenate = (string) $coordenate;
 			foreach ( $param_values as $param_name => $param_value ) {
@@ -109,7 +109,7 @@ final class SVGPath_Helpers {
 			$coordenate_float = (float) $coordenate / $scale;
 			return (string) $coordenate_float;
 		};
-		// =======
+		// ======= transform function only for X coords:
 		$fn_transform_x_coordenate = function ( string|float $coordenate ) use ( $base_x_coord, $fn_transform_any_coordenate ) {
 			$coordenate       = $fn_transform_any_coordenate( $coordenate );
 			$coordenate_float = (float) $coordenate + $base_x_coord;
