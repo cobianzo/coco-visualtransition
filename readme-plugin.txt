@@ -1,9 +1,9 @@
 === Coco Visual Transition ===
 Contributors: @cobianzo
-Tags: frets, container transitions, visual effects, decorative patterns, seamless transitions, UI transitions
+Tags: frets, container transitions, visual effects, decorative patterns, seamless transitions
 Requires at least: 6.0
 Tested up to: 6.8
-Stable tag: 2.2.1
+Stable tag: 2.2.2
 Requires PHP: 8.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html

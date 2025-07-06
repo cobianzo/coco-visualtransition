@@ -1,6 +1,6 @@
 {
   "name": "coco-visualtransition",
-  "version": "2.2.1",
+  "version": "2.2.2",
   "description": "Plugin para scraping de carteleras",
   "type": "module",
   "scripts": {
