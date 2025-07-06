@@ -1,0 +1,33 @@
+---
+description: WP ENV plugin development stack
+globs:
+alwaysApply: true
+---
+
+- I am developing a plugin for WordPress
+- I am using the environment wp-env to develop it
+
+- I use custom node and bash scripts to automate some tasks, like:
+	- the building and zipping of the plugin for distribution: using `/bin/build-plugin.js` into the `/dist`
+	- the increase of the version (patch, minor, major) all around the code with `/bin/version.increment.js`
+
+# PHP Code
+
+- The entry of the plugin is the file `coco-visualtransition.php`
+- Most of the PHP logic will be in `/inc`
+- I always use the standards of WordPress VIP coding rules.
+- I work in OOP instead of procedural functions.
+- I use PHPCS, PHPBF, PHPStan, EsLint as development tools.
+- I use PHPUnit testing inside if the folder `/tests`
+
+# Typescript -> Javascript Code
+
+- We use typescript for the javascript code
+- The entry point for the typescript is `/src/index.ts` and in it compiles into `/build/index.js`, which is enqueued by the php in `/inc/class-admin-enqueue.php`
+- Most of the typescript code is in `/src`, and it compiles into `/build` using wp-script package.
+
+# WHAT THE PLUGIN DOES
+
+- My plugin is meant to add new attributes and contols to the core block `core/group`, under the panel `Visual Transition`
+- These attributes allow the user to add a visual fret, based on a pattern, to the top of the group container. This fret clips the group container, making it "melt" with the previous container.
+

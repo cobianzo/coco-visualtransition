@@ -55,8 +55,7 @@
   "files.watcherExclude": {
     "**/wordpress/**": true
   },
-  "intelephense.environment.includePaths": [
-    "wordpress/wp-includes",
-    "wordpress/wp-admin"
+  "intelephense.stubs": [
+    "wordpress"
   ]
 }

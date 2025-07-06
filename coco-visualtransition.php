@@ -3,7 +3,7 @@
  * Plugin Name: Coco Visual Transition
  * Plugin URI: https://cobianzo.com/plugins/coco-visualtransition/
  * Description: A plugin for visual transitions
- * Version: 2.2.2
+ * Version: 2.2.3
  * Author: cobianzo
  * Author URI: https://cobianzo.com
  * License: GPL-2.0-or-later
@@ -24,22 +24,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Define plugin constants
  */
-define( 'COCO_VT_VERSION', '2.2.2' );
+define( 'COCO_VT_VERSION', '2.2.3' );
 define( 'COCO_VT_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'COCO_VT_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
-
-/**
- * Load plugin textdomain
- *
- * @return void
- */
-function coco_vt_load_textdomain(): void {
-	load_plugin_textdomain(
-		'coco-visualtransition',
-		false,
-		dirname( plugin_basename( __FILE__ ) ) . '/languages'
-	);
-}
 
 /**
  * Initialize plugin
@@ -47,8 +34,6 @@ function coco_vt_load_textdomain(): void {
  * @return void
  */
 function coco_vt_init(): void {
-	// quick hooks
-	add_action( 'plugins_loaded', 'coco_vt_load_textdomain' );
 
 	// includes
 	require_once COCO_VT_PLUGIN_DIR . 'inc/helpers/class-generic-helpers.php';

@@ -1,7 +1,7 @@
 {
   "name": "coco/visualtransition",
   "description": "WP Plugin which creates a visual transition between vertical blocks",
-  "version": "2.2.2",
+  "version": "2.2.3",
   "type": "wordpress-plugin",
   "license": "GPL-2.0-or-later",
   "autoload": {
@@ -31,7 +31,8 @@
     "phpunit/phpunit": "^9.6",
     "yoast/phpunit-polyfills": "^1.0 || ^2.0 || ^4.0",
     "spatie/phpunit-watcher": "^1.24",
-    "php-stubs/wordpress-stubs": "^6.8"
+    "php-stubs/wordpress-stubs": "^6.8",
+    "php-stubs/wordpress-tests-stubs": "^6.8"
   },
   "config": {
     "allow-plugins": {
