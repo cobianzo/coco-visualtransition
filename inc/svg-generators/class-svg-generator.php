@@ -170,28 +170,24 @@ class SVG_Generator {
 		 * HERE is where we create the <svg>, it will be appended right after the div
 		 */
 		if ( ! isset( $this->pattern_data['type'] ) || 'clipPath' === $this->pattern_data['type'] ) {
-			$this->svg_string = <<<SVG
-	<svg width="0" height="0" $extra_attrs_string>
+			$this->svg_string = '<svg width="0" height="0" ' . $extra_attrs_string . '>
 		<defs>
-			<clipPath id="$this->pattern_id" clipPathUnits="objectBoundingBox">
-				$shape_string
+			<clipPath id="' . $this->pattern_id . '" clipPathUnits="objectBoundingBox">
+				' . $shape_string . '
 			</clipPath>
 		</defs>
-	</svg>
-	SVG;
+	</svg>';
 		} else {
 
 			$shape_string = str_replace( '/>', ' fill="rgba(255,255,255, 1)" />', $shape_string );
 
-			$this->svg_string = <<<SVG
-	<svg width="0" height="0" $extra_attrs_string>
+			$this->svg_string = '<svg width="0" height="0" ' . $extra_attrs_string . '>
 		<defs>
-			<mask id="$this->pattern_id" maskUnits="objectBoundingBox" maskContentUnits="objectBoundingBox">
-				$shape_string
+			<mask id="' . $this->pattern_id . '" maskUnits="objectBoundingBox" maskContentUnits="objectBoundingBox">
+				' . $shape_string . '
 			</mask>
 		</defs>
-	</svg>
-	SVG;
+	</svg>';
 		}
 		return $this->svg_string;
 	}

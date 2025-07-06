@@ -1,15 +1,13 @@
 TODO
 ===
 
-- Make it work with group sections (problems so far)
-- Fix small warnings from Plugin check.
-- performance with masks is low. We can try to find alternatives using pseudoselectos to add two masks effects.
+- Make it work with group sections (problems so far, so i've restricted to make it work only with <div>)
+- performance with masks is low. We can try to find alternatives using pseudoselectos (:before) to add two masks effects.
 - Add z-index 1 and see if it works.
-- Add option to change height in mobile
+- Add option to change height in mobile or disable the visual transition in mobile at least
 - add cache when creating inline css. If params are the same, result shoudl be the same.
 - localization
 - fix phpunit tests and add e2e tests.
-- create a nicer pattern with mask and semitransparency.
 - create option to validate the plugin with my server, so we can create the pro version of the plugin.
 - Eslint doesnt apply prettier formatting (ie, if a line doesnt end with semicolon, it doest detect the error, and doesnt add it on save)
 - Nice-to-have: Include option to load the pattern from a svg file.
@@ -170,6 +168,25 @@ Then we can access locally o inside the container to wp-content/plugins/coco-vis
 ## Useful WP CLI commands
 
 ...
+
+## TRANSLATIONS (localization)
+
+To create the .pot with all tranlatable strings, get into the container with
+`npm run cli bash`
+and
+```
+cd wp-content/plugins/coco-visualtransition
+wp i18n make-pot . languages/coco-visualtransition.pot --domain=coco-visualtransition
+```
+To make the translations you can use Poedit, opening `coco-visualtransition-es_ES.po`, and update the catalogue from the .pot ( Translation > Update from POT File ).
+Then translate what you want. To make the translations you can use Poedit, but I like to open the .po with VSCode, and translate the strings with IA, under the promt 'for every empty msgstr, set the translation from msgid into italian.'.
+Then, to create the .mo files, we need to run
+```
+wp i18n make-mo ./languages/
+```
+it takes a while to be created.
+And for the `.json`, needed for the typescript tranlations:
+`wp i18n make-json ./languages/`
 
 # Useful tools to develop shapes
 

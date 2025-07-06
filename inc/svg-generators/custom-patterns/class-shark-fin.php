@@ -43,16 +43,14 @@ class Shark_Fin extends SVG_Generator {
 			fn( float $c ): float => $c / 100.0
 		);
 
-		$this->svg_string = <<<SVG
-<svg width="0" height="0" style="position:absolute;overflow:hidden;">
+		$this->svg_string = '<svg width="0" height="0" style="position:absolute;overflow:hidden;">
 	<defs>
-		<mask id="$this->pattern_id"
+		<mask id="' . $this->pattern_id . '"
 		 maskUnits="objectBoundingBox" maskContentUnits="objectBoundingBox">
-			<path d="$path" fill="white" />
+			<path d="' . $path . '" fill="white" />
 		</mask>
 	</defs>
-</svg>
-SVG;
+</svg>';
 
 		return $this->svg_string;
 	}

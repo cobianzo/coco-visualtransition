@@ -51,6 +51,13 @@ class Admin_Enqueue {
 				'nonce' => wp_create_nonce( 'coco_visual_transition_nonce' ),
 			]
 		);
+
+		// Load JavaScript translations
+		wp_set_script_translations(
+			'coco-visualtransition',
+			'coco-visualtransition',
+			plugin_dir_path( __DIR__ ) . 'languages'
+		);
 	}
 }
 

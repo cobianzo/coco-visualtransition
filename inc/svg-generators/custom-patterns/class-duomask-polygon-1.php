@@ -44,17 +44,15 @@ class DuoMask_Polygon_1 extends SVG_Generator {
 		);
 		$mask_path = 'M -0.1 0 ' . $mask_path . ' L 1.1 1.1 L -0.1 1.1 Z';
 
-		$this->svg_string = <<<SVG
-<svg width="0" height="0" style="position:absolute;overflow:hidden;">
+		$this->svg_string = '<svg width="0" height="0" style="position:absolute;overflow:hidden;">
 	<defs>
-		<mask id="$this->pattern_id"
+		<mask id="' . $this->pattern_id . '"
 		 maskUnits="objectBoundingBox" maskContentUnits="objectBoundingBox">
-			<path d="$semitranslarent_path" fill="red" />
-			<path d="$mask_path" fill="white" />
+			<path d="' . $semitranslarent_path . '" fill="red" />
+			<path d="' . $mask_path . '" fill="white" />
 		</mask>
 	</defs>
-</svg>
-SVG;
+</svg>';
 
 		return $this->svg_string;
 	}

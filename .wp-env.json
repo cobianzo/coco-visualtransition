@@ -1,6 +1,9 @@
 {
   "core": null,
-  "plugins": ["."],
+  "plugins": [
+    ".",
+    "https://downloads.wordpress.org/plugin/plugin-check.zip"
+  ],
   "phpVersion": "8.1",
   "port": 1000,
   "testsPort": 1001,

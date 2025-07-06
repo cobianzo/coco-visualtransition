@@ -1,0 +1,42 @@
+{
+    "translation-revision-date": "2025-07-05 19:38-0600",
+    "generator": "WP-CLI/2.12.0",
+    "source": "build/index.js",
+    "domain": "coco-visualtransition",
+    "locale_data": {
+        "coco-visualtransition": {
+            "": {
+                "domain": "coco-visualtransition",
+                "lang": "es",
+                "plural-forms": "nplurals=2; plural=(n != 1);"
+            },
+            "Visual transitions are only available when the Group block uses a 'div' element. Current tag: ": [
+                "Las transiciones visuales solo están disponibles cuando el bloque Grupo utiliza un elemento 'div'. Etiqueta actual: "
+            ],
+            "Enable Visual Transition": [
+                "Activar transición visual"
+            ],
+            "Select Transition Effect": [
+                "Seleccionar efecto de transición"
+            ],
+            "Pattern Height %": [
+                "Altura del patrón %"
+            ],
+            "Adjust the height of the transition pattern %": [
+                "Ajustar la altura del patrón de transición %"
+            ],
+            "Pattern Width %": [
+                "Ancho del patrón %"
+            ],
+            "Adjust the width of the transition pattern": [
+                "Ajustar el ancho del patrón de transición"
+            ],
+            "Negative offset Y (px)": [
+                "Desplazamiento negativo Y (px)"
+            ],
+            "Overlaps the group with the precendent group by translating it on the Y axis. This control overwrites the margin top. It allows you to assign negative value to it. Note that the margin top will change the value to fit this one in pixels": [
+                "Superpone el grupo con el grupo precedente trasladándolo en el eje Y. Este control sobrescribe el margen superior. Permite asignar un valor negativo. Ten en cuenta que el margen superior cambiará el valor para ajustarse a este en píxeles."
+            ]
+        }
+    }
+}
