@@ -10,6 +10,9 @@ import { PanelBody, CheckboxControl, SelectControl, RangeControl, Notice } from 
 import { Fragment } from "@wordpress/element";
 import { __ } from "@wordpress/i18n";
 
+// Ensure translations are loaded for this domain
+// @wordpress/i18n will automatically load translations from the JSON files
+
 // Internal dependencies
 import patterns from './patterns.json';
 import { getInlineCssSvg, appendInlineCss, deleteInlineCss } from './add-cssinline-editor';

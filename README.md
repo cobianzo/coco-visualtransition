@@ -186,7 +186,9 @@ wp i18n make-mo ./languages/
 ```
 it takes a while to be created.
 And for the `.json`, needed for the typescript tranlations:
-`wp i18n make-json ./languages/`
+```
+wp i18n make-json ./languages/
+```
 
 # Useful tools to develop shapes
 

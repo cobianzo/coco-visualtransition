@@ -34,9 +34,11 @@ class Admin_Enqueue {
 		 */
 		$asset_file = include plugin_dir_path( __DIR__ ) . 'build/index.asset.php';
 
-		// Gutenberg filters, plugins, js in general.
-		wp_enqueue_script(
-			'coco-visualtransition',
+		$script_handle = 'coco-visualtransition';
+
+		// Register the script before enqueueing.
+		wp_register_script(
+			$script_handle,
 			plugins_url( '/build/index.js', __DIR__ ),
 			$asset_file['dependencies'],
 			$asset_file['version'],
@@ -44,20 +46,24 @@ class Admin_Enqueue {
 		);
 
 		// Localize script to expose custom variables to window object
+		// TODELETE: we are not using this nonce yet.
 		wp_localize_script(
-			'coco-visualtransition',
+			$script_handle,
 			'cocoVisualTransition',
 			[
 				'nonce' => wp_create_nonce( 'coco_visual_transition_nonce' ),
 			]
 		);
 
-		// Load JavaScript translations
+		// Load JSON translations for the plugin.
+		$languages_dir = plugin_dir_path( __DIR__ ) . 'languages';
 		wp_set_script_translations(
+			$script_handle,
 			'coco-visualtransition',
-			'coco-visualtransition',
-			plugin_dir_path( __DIR__ ) . 'languages'
+			$languages_dir
 		);
+
+		wp_enqueue_script( $script_handle );
 	}
 }
 

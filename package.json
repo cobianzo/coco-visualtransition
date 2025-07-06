@@ -27,9 +27,7 @@
     "wordpress:install": "wp-env run cli wp core download --path=wordpress",
     "lint": "eslint src/",
     "lint:fix": "eslint src/ --ext js,ts,tsx --fix",
-    "lint:php": "composer run-script format . && composer run-script lint .  && composer run-script analyze",
-    "make-pot": "wp-env run cli wp i18n make-pot . languages/coco-visualtransition.pot --domain=coco-visualtransition",
-    "make-json": "wp-env run cli wp i18n make-json languages/coco-visualtransition.pot languages --domain=coco-visualtransition"
+    "lint:php": "composer run-script format . && composer run-script lint .  && composer run-script analyze"
   },
   "author": "@cobianzo",
   "license": "GPL-2.0-or-later",
