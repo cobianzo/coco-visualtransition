@@ -23,7 +23,8 @@ $y_offset = is_string( $atts['y-offset'] ) || is_numeric( $atts['y-offset'] ) ? 
 <style id="coco-vt-<?php echo esc_attr( $id ); ?>">
 
 	<?php
-	// ['data-cocovisualtransitionid'] {  css rules ... }
+	// [data-cocovisualtransitionid=XXX] {  css rules ... }  <<-- FOR THE FRONTEND
+	// [data-block=XXX] { css rules }  << --- FOR THE EDITOR
 	?>
 	[<?php echo esc_attr( $selector ); ?>="<?php echo esc_attr( $id ); ?>"]{
 		<?php if ( ! $is_mask ) : ?>
@@ -51,14 +52,14 @@ $y_offset = is_string( $atts['y-offset'] ) || is_numeric( $atts['y-offset'] ) ? 
 		TODO: create an alternative way to create patterns
 		&::before {
 			content: '';
-        height: 100px;
-        background: green;
-        position: absolute;
+        height: $atts[pattern-height];
         width: 100%;
         left: 0;
+        top: 0;
+        background: inherit;
+        position: absolute;
         translate: 0 -100%;
         clip-path: url(#pattern-vt_e2013ca6-a8b8-4bf6-ade8-120b8b463ee3);
-        top: 0;
 		}
 		*/
 		?>

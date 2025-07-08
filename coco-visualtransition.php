@@ -41,14 +41,14 @@ function coco_vt_init(): void {
 	require_once COCO_VT_PLUGIN_DIR . 'inc/class-admin-enqueue.php';
 
 	// services
-	require_once COCO_VT_PLUGIN_DIR . 'inc/services/class-inlinecss-cache.php';
-	require_once COCO_VT_PLUGIN_DIR . 'inc/services/class-inlinecss-renderer.php';
+	require_once COCO_VT_PLUGIN_DIR . 'inc/inlinecss/class-inlinecss-cache.php';
+	require_once COCO_VT_PLUGIN_DIR . 'inc/inlinecss/class-inlinecss-renderer.php';
 
 	// controllers
-	require_once COCO_VT_PLUGIN_DIR . 'inc/controllers/class-inlinecss-block-controller.php';
-	require_once COCO_VT_PLUGIN_DIR . 'inc/controllers/class-inlinecss-rest-controller.php';
+	require_once COCO_VT_PLUGIN_DIR . 'inc/inlinecss/class-inlinecss-block-controller.php';
+	require_once COCO_VT_PLUGIN_DIR . 'inc/inlinecss/class-inlinecss-rest-controller.php';
 
-	require_once COCO_VT_PLUGIN_DIR . 'inc/class-inlinecss.php';
+	require_once COCO_VT_PLUGIN_DIR . 'inc/inlinecss/class-inlinecss.php';
 
 	require_once COCO_VT_PLUGIN_DIR . 'inc/svg-generators/class-svg-generator.php';
 }
