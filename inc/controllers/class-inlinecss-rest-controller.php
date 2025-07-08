@@ -57,6 +57,7 @@ final class InlineCSS_REST_Controller {
 		] );
 	}
 
+	// phpcs:disable Squiz.Functions.MultiLineFunctionDeclaration.ContentAfterBrace
 	/**
 	 * Handle the REST API request for SVG/CSS generation. Used by typescript.
 	 *
@@ -64,6 +65,8 @@ final class InlineCSS_REST_Controller {
 	 * @return string|\WP_Error
 	 */
 	public static function handle_rest_request( \WP_REST_Request $request ) { // @phpstan-ignore-line.
+
+		// phpcs:enable Squiz.Functions.MultiLineFunctionDeclaration.ContentAfterBrace
 		$params = $request->get_params();
 		if ( ! isset( $params['block_id'] ) || ! isset( $params['pattern_name'] ) ) {
 			return new \WP_Error(
@@ -98,12 +101,10 @@ final class InlineCSS_REST_Controller {
 		];
 		$svg_and_style = InlineCSS_Cache::get( $pattern_name, $block_id, $atts );
 		if ( null === $svg_and_style ) {
-			$rendered      = InlineCSS_Renderer::generate_svg_and_css( $pattern_name, $block_id, $atts );
+			$rendered      = InlineCSS_Renderer::generate_svg_and_css( $pattern_name, $block_id, $atts, 'data-block' );
 			$svg_and_style = $rendered['svg'] . $rendered['css'];
 			InlineCSS_Cache::set( $pattern_name, $block_id, $atts, $svg_and_style );
 		}
-		// change the name of the selector, which is different in the editor than in the FE.
-		$svg_and_style = str_replace( 'data-cocovisualtransitionid', 'data-block', $svg_and_style );
 		return $svg_and_style;
 	}
 }

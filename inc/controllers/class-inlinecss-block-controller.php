@@ -40,6 +40,24 @@ final class InlineCSS_Block_Controller {
 	}
 
 	/**
+	 * Injects an attribute into the first <div> of the block content.
+	 *
+	 * @param string $block_content The block content HTML.
+	 * @param string $attribute The attribute name to add.
+	 * @param string $value The value of the attribute.
+	 * @return string Modified block content with the attribute injected.
+	 */
+	private static function inject_attribute_to_first_div( string $block_content, string $attribute, string $value ): string {
+		$result = preg_replace(
+			'/<div\\b(.*?)>/',
+			'<div$1 ' . $attribute . '="' . esc_attr( $value ) . '">',
+			$block_content,
+			1
+		);
+		return is_string( $result ) ? $result : (string) $block_content;
+	}
+
+	/**
 	 * Custom render function for group blocks with visual transition.
 	 *
 	 * @param string               $block_content The block content about to be rendered.
@@ -51,13 +69,13 @@ final class InlineCSS_Block_Controller {
 			|| ! isset( $block['attrs']['visualTransitionName'] ) ) {
 			return $block_content;
 		}
+		// add attribute to the block (for the frontend)
 		if ( 'core/group' === $block['blockName'] && ! empty( $block['attrs']['visualTransitionName'] ) ) {
 			$random_id     = 'vt_' . wp_generate_uuid4();
-			$block_content = preg_replace(
-				'/<div\b(.*?)>/',
-				'<div$1 data-cocovisualtransitionid="' . $random_id . '">',
+			$block_content = self::inject_attribute_to_first_div(
 				$block_content,
-				1
+				'data-cocovisualtransitionid',
+				$random_id
 			);
 			$atts          = [
 				'pattern-height' => isset( $block['attrs']['patternHeight'] ) && is_numeric( $block['attrs']['patternHeight'] ) ? (float) $block['attrs']['patternHeight'] : 0.08,
