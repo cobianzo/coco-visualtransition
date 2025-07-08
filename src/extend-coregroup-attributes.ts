@@ -21,6 +21,10 @@ const customAttributes = {
 		type: 'integer',
 		default: 0,
 	},
+	typePattern: {
+		type: 'string',
+		default: '%', // Allowed: '%' or 'px'
+	},
 };
 
 /**

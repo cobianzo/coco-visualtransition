@@ -81,6 +81,7 @@ final class InlineCSS_Block_Controller {
 				'pattern-height' => isset( $block['attrs']['patternHeight'] ) && is_numeric( $block['attrs']['patternHeight'] ) ? (float) $block['attrs']['patternHeight'] : 0.08,
 				'pattern-width'  => isset( $block['attrs']['patternWidth'] ) && is_numeric( $block['attrs']['patternWidth'] ) ? (float) $block['attrs']['patternWidth'] : 0.1,
 				'y-offset'       => isset( $block['attrs']['YOffset'] ) && is_numeric( $block['attrs']['YOffset'] ) ? (float) $block['attrs']['YOffset'] : 0.0,
+                'type-pattern'    => isset( $block['attrs']['typePattern'] ) && in_array( $block['attrs']['typePattern'], [ '%', 'px' ], true ) ? $block['attrs']['typePattern'] : '%',
 			];
 			$pattern       = is_string( $block['attrs']['visualTransitionName'] )
 				? $block['attrs']['visualTransitionName']

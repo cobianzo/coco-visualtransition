@@ -89,6 +89,13 @@ class SVG_Generator {
 	public string $svg_string;
 
 	/**
+	 * Unit type for the pattern height (either '%' or 'px').
+	 *
+	 * @var string
+	 */
+	public string $type_pattern = '%';
+
+	/**
 	 * We generate %this->points, which define the shape of the mask.
 	 *
 	 * @param string               $pattern_name ie trianges, waves, squares ...
@@ -119,6 +126,8 @@ class SVG_Generator {
 
 		$this->pattern_width = ( isset( $atts['pattern-width'] ) && '' !== $atts['pattern-width'] )
 			? (float) Generic_Helpers::to_float( $atts['pattern-width'] ) : 0.0;
+
+        $this->type_pattern = ( isset( $atts['type-pattern'] ) && in_array( $atts['type-pattern'], [ '%', 'px' ], true ) ) ? $atts['type-pattern'] : '%';
 
 
 		// these will create the $this->svg_string.

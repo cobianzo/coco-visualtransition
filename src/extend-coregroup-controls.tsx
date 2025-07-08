@@ -24,6 +24,7 @@ interface CustomAttributes {
 	patternHeight?: number;
 	patternWidth?: number;
 	YOffset?: number;
+	typePattern?: string; // Add typePattern
 }
 
 // Crear componente HOC para extender el panel de Inspector
@@ -37,7 +38,7 @@ const newCoreBlock = createHigherOrderComponent(
 
 		// init variables for the controls
 		const { attributes, setAttributes } = props;
-		const { visualTransitionName, tagName = 'div' } = attributes;
+		const { visualTransitionName, tagName = 'div', typePattern = '%' } = attributes;
 
 		// Check if tagName is different from 'div'
 		const isTagNameDiv = tagName === 'div';
@@ -94,8 +95,7 @@ const newCoreBlock = createHigherOrderComponent(
 							label={__("Enable Visual Transition", "coco-visualtransition")}
 							checked={checkBoxOn}
 							disabled={!isTagNameDiv}
-							onChange={(value: boolean) => setCheckBoxOn(value)
-							}
+							onChange={(value: boolean) => setCheckBoxOn(value)}
 						/>
 
 						{checkBoxOn && isTagNameDiv && (
@@ -108,14 +108,38 @@ const newCoreBlock = createHigherOrderComponent(
 										setAttributes({ visualTransitionName: value })
 									}
 								/>
+
+								{/* Radio control for typePattern */}
+								<div style={{ marginBottom: '16px' }}>
+									<label style={{ fontWeight: 'bold', display: 'block', marginBottom: 4 }}>{__("Pattern Height Unit", "coco-visualtransition")}</label>
+									<label style={{ marginRight: 12 }}>
+										<input
+											type="radio"
+											checked={typePattern === '%'}
+											value="%"
+											onChange={() => setAttributes({ typePattern: '%' })}
+										/>
+										{' %'}
+									</label>
+									<label>
+										<input
+											type="radio"
+											checked={typePattern === 'px'}
+											value="px"
+											onChange={() => setAttributes({ typePattern: 'px' })}
+										/>
+										{' px'}
+									</label>
+								</div>
+
 								{ showPatternHeightControl &&  <RangeControl
-										label={__("Pattern Height %", "coco-visualtransition")}
-										value={attributes.patternHeight || 0.1}
-										onChange={(value) => setAttributes({ patternHeight: value })}
-										min={0.0}
-										max={1.0}
-										step={0.01}
-										help={__("Adjust the height of the transition pattern %", "coco-visualtransition")}
+									label={__(`Pattern Height (${typePattern})`, "coco-visualtransition")}
+									value={attributes.patternHeight || 0.1}
+									onChange={(value) => setAttributes({ patternHeight: value })}
+									min={typePattern === '%' ? 0.0 : 0}
+									max={typePattern === '%' ? 1.0 : 200}
+									step={typePattern === '%' ? 0.01 : 1}
+									help={__(`Adjust the height of the transition pattern (${typePattern})`, "coco-visualtransition")}
 								/>
 								}
 
