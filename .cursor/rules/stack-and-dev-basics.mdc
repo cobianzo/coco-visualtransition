@@ -13,12 +13,17 @@ alwaysApply: true
 
 # PHP Code
 
-- The entry of the plugin is the file `coco-visualtransition.php`
 - Most of the PHP logic will be in `/inc`
-- I always use the standards of WordPress VIP coding rules.
-- I work in OOP instead of procedural functions.
 - I use PHPCS, PHPBF, PHPStan, EsLint as development tools.
 - I use PHPUnit testing inside if the folder `/tests`
+
+## Practices in PHP Code
+
+- I work in OOP instead of procedural functions.
+- I always use the standards of WordPress VIP coding rules.
+- Use SOLID principles.
+- Try not to create long files with more than 250 lines of code (excluding comments)
+- Whenever you create a new file whose code is needed for the plugin, you must include the file in the entry file `coco-visualtransition.php`
 
 # Typescript -> Javascript Code
 
