@@ -24,6 +24,7 @@ alwaysApply: true
 - Use SOLID principles.
 - Try not to create long files with more than 250 lines of code (excluding comments)
 - Whenever you create a new file whose code is needed for the plugin, you must include the file in the entry file `coco-visualtransition.php`
+- Leave some empty lines from time to time to make the code more understandable. Adding comments whenever the code is making certaing task.
 
 # Typescript -> Javascript Code
 

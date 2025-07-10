@@ -10,6 +10,7 @@
 namespace COCO\VisualTransition\Services;
 
 use Coco\VisualTransition\SVG_Generator_Factory;
+use COCO\VisualTransition\Templates\CSS_Template_Loader;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -35,11 +36,18 @@ final class InlineCSS_Renderer {
 		$svg        = $generator->svg_string;
 		$pattern_id = $generator->pattern_id;
 		$is_mask    = isset( $generator->pattern_data['type'] ) && 'mask' === $generator->pattern_data['type'];
-		// Include and use the CSS template
-		ob_start();
-		// Make $selector available to the template
-		include plugin_dir_path( __FILE__ ) . '/../templates/css-template.php';
-		$css = ob_get_clean();
+
+		// Incluir la clase de renderizado de plantilla si no existe
+		if ( ! class_exists( '\COCO\\VisualTransition\\Templates\\CSS_Template_Loader' ) ) {
+			require_once plugin_dir_path( __FILE__ ) . '/../templates/class-css-template-loader.php';
+		}
+
+		if ( '%' === $generator->type_pattern ) {
+			$css = CSS_Template_Loader::render_percent( $id, $pattern_id, $is_mask, $atts, $selector );
+		} else {
+			$css = CSS_Template_Loader::render_px( $id, $pattern_id, $is_mask, $atts, $selector );
+		}
+
 		return [
 			'svg'        => $svg,
 			'css'        => $css ? $css : '',

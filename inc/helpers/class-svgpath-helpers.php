@@ -309,6 +309,62 @@ final class SVGPath_Helpers {
 		return $path;
 	}
 
+
+	/**
+	 * Finds the maximum Y coordinate in a given SVG path string.
+	 *
+	 * This function parses the path string, iterates over all Y coordinates, and returns the highest Y value found.
+	 *
+	 * @param string $path_string The SVG path string to analyze.
+	 * @return float The maximum Y coordinate found in the path, or 0.0 if none found.
+	 */
+	public static function get_max_y_from_path( string $path_string ): float {
+		$max_y = null;
+
+		// Callback for X coordinates (no-op, just return as is)
+		$fn_noop_x = function ( $x ) {
+			return $x;
+		};
+
+		// Callback for Y coordinates: update $max_y if this Y is greater
+		$fn_track_max_y = function ( $y ) use ( &$max_y ) {
+			$y_float = (float) $y;
+			if ( $max_y === null || $y_float > $max_y ) {
+				$max_y = $y_float;
+			}
+			return $y;
+		};
+
+		self::apply_transform_to_path_coordenates( $path_string, $fn_noop_x, $fn_track_max_y );
+
+		return $max_y !== null ? $max_y : 0.0;
+	}
+
+	/**
+	 * Scales all Y coordinates in the given SVG path string so that the minimum Y becomes 0 and the maximum Y becomes 1.
+	 *
+	 * @param string $path_string The SVG path string to scale.
+	 * @param float $multiplier_factor Once the Y coords are scaled from 0 to 1, we can multiply by a factor in % per 1, i.e 0.5
+	 * @return string The path string with Y coordinates scaled from 0 to 1.
+	 */
+	public static function scale_y_to_unit_interval( string $path_string, float $multiplier_factor = 1.0 ): string {
+		$max_y = self::get_max_y_from_path( $path_string );
+
+		if ( $max_y == 0 ) {
+			return $path_string;
+		}
+
+		$fn_noop_x  = fn ( $x ) => $x;
+		$fn_scale_y = function ( $y ) use ( $max_y, $multiplier_factor ) {
+			$y_float = (float) $y;
+			return round( ( $y_float / $max_y ) * $multiplier_factor, 3 );
+		};
+
+		return self::apply_transform_to_path_coordenates( $path_string, $fn_noop_x, $fn_scale_y );
+	}
+
+
+
 	/**
 	 * Sanitizes a string path by removing extra whitespace.
 	 *

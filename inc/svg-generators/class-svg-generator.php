@@ -127,7 +127,7 @@ class SVG_Generator {
 		$this->pattern_width = ( isset( $atts['pattern-width'] ) && '' !== $atts['pattern-width'] )
 			? (float) Generic_Helpers::to_float( $atts['pattern-width'] ) : 0.0;
 
-        $this->type_pattern = ( isset( $atts['type-pattern'] ) && in_array( $atts['type-pattern'], [ '%', 'px' ], true ) ) ? $atts['type-pattern'] : '%';
+		$this->type_pattern = ( isset( $atts['type-pattern'] ) && in_array( $atts['type-pattern'], [ '%', 'px' ], true ) ) ? $atts['type-pattern'] : '%';
 
 
 		// these will create the $this->svg_string.
@@ -240,6 +240,8 @@ class SVG_Generator {
 
 		$path_string = ( $is_trajectory ? 'M ' : '' ) . "$start_point_x 0";
 		$x_size      = $this->pattern_width;
+		// Determinar y_size según el tipo de patrón
+		$y_size = ($this->type_pattern === 'px') ? 1 : $this->pattern_height;
 
 		// $path_string building on every iteration.
 		// we add one set of the 'pattern' on every iteration.
@@ -252,7 +254,7 @@ class SVG_Generator {
 			foreach ( $pattern_array as $points ) {
 				$coordenates_from_pattern .= ' ' . SVGPath_Helpers::replace_points_placeholders( $points, $latest_x_point, [
 					'x_size' => $x_size,
-					'y_size' => $this->pattern_height,
+					'y_size' => $y_size,
 					'scale'  => $scale,
 				] );
 			}

@@ -93,13 +93,13 @@ final class InlineCSS_REST_Controller {
 		$pattern_height = isset( $pattern_attrs['patternHeight'] ) && is_numeric( $pattern_attrs['patternHeight'] ) ? (float) $pattern_attrs['patternHeight'] : 0.08;
 		$pattern_width  = isset( $pattern_attrs['patternWidth'] ) && is_numeric( $pattern_attrs['patternWidth'] ) ? (float) $pattern_attrs['patternWidth'] : 0.1;
 		$y_offset       = isset( $pattern_attrs['YOffset'] ) && is_numeric( $pattern_attrs['YOffset'] ) ? (int) $pattern_attrs['YOffset'] : 0;
-        $type_pattern   = isset( $pattern_attrs['typePattern'] ) && in_array( $pattern_attrs['typePattern'], [ '%', 'px' ], true ) ? $pattern_attrs['typePattern'] : '%';
+		$type_pattern   = isset( $pattern_attrs['typePattern'] ) && in_array( $pattern_attrs['typePattern'], [ '%', 'px' ], true ) ? $pattern_attrs['typePattern'] : '%';
 
 		$atts          = [
 			'pattern-height' => $pattern_height,
 			'pattern-width'  => $pattern_width,
 			'y-offset'       => $y_offset,
-            'type-pattern'    => $type_pattern,
+			'type-pattern'   => $type_pattern,
 		];
 		$svg_and_style = InlineCSS_Cache::get( $pattern_name, $block_id, $atts );
 		if ( null === $svg_and_style ) {

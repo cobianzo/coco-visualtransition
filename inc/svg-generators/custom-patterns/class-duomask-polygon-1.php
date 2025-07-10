@@ -26,25 +26,37 @@ class DuoMask_Polygon_1 extends SVG_Generator {
 	 */
 	public function generate_svg(): string {
 
-		// semitransparent mask path
+		$fn_divide_by_100 = fn( float $c ): float => $c / 100.0;
+		// semitransparent mask path. Defined in % per cent, and transformed in % per 1.
 		$semitranslarent_path = ' L -1.06 3.591 L 13.991 0.119 L 52.265 7.816 L 74.952 1.2 L 82.687 3.075 L 102.672 1.202';
 		$semitranslarent_path = SVGPath_Helpers::apply_transform_to_path_coordenates(
 			$semitranslarent_path,
-			fn( float $c ): float => $c / 100.0,
-			fn( float $c ): float => $c / 100.0
+			$fn_divide_by_100,
+			$fn_divide_by_100
 		);
-		$semitranslarent_path = 'M -0.1 0' . $semitranslarent_path . ' L 1.1 1.1 L -0.1 1.1 Z'; // close path
+		$semitranslarent_path = SVGPath_Helpers::scale_y_to_unit_interval( $semitranslarent_path );
+
+		if ( '%' === $this->type_pattern ) {
+			$semitranslarent_path = SVGPath_Helpers::scale_y_to_unit_interval( $semitranslarent_path );
+		}
+
+		$semitranslarent_path = SVGPath_Helpers::close_path( $semitranslarent_path );
 
 		// opaque mask path
 		$mask_path = ' L -0.582 6.674 L 15.93 0.5 L 48.978 10.0 L 72.308 4.903 L 80.235 7.796 L 102.35 2.584';
 		$mask_path = SVGPath_Helpers::apply_transform_to_path_coordenates(
 			$mask_path,
-			fn( float $c ): float => $c / 100.0,
-			fn( float $c ): float => $c / 100.0
+			$fn_divide_by_100,
+			$fn_divide_by_100
 		);
-		$mask_path = 'M -0.1 0 ' . $mask_path . ' L 1.1 1.1 L -0.1 1.1 Z';
+		if ( 'px' === $this->type_pattern ) {
+			$mask_path = SVGPath_Helpers::scale_y_to_unit_interval( $mask_path );
+		}
+		$mask_path = SVGPath_Helpers::close_path( $mask_path );
 
-		$this->svg_string = '<svg width="0" height="0" style="position:absolute;overflow:hidden;">
+
+		$this->svg_string = '<svg width="0" height="0"
+			style="position:absolute;overflow:hidden;" class="svg-for-' . $this->pattern_name . '">
 	<defs>
 		<mask id="' . $this->pattern_id . '"
 		 maskUnits="objectBoundingBox" maskContentUnits="objectBoundingBox">

@@ -94,5 +94,5 @@ export function appendInlineCss( id: string, cssAndSvg: string) {
 }
 
 function getIdContainer(id:string): string {
-	return `coco-vt-${id}`;
+	return `coco-vt-block-${id}`;
 }

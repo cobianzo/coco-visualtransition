@@ -1,16 +1,12 @@
 TODO
 ===
 
-- Make it work with group sections (problems so far, so i've restricted to make it work only with <div>)
-- performance with masks is low. We can try to find alternatives using pseudoselectos (:before) to add two masks effects.
-- Add z-index 1 and see if it works.
+- Make it work with group sections (problems so far, so i've restricted to make it work only with <div>)- Add z-index 1 and see if it works.
 - Add option to change height in mobile or disable the visual transition in mobile at least
-- add cache when creating inline css. If params are the same, result shoudl be the same.
-- localization
 - add e2e tests and more phpunit tests.
 - create option to validate the plugin with my server, so we can create the pro version of the plugin.
 - Eslint doesnt apply prettier formatting (ie, if a line doesnt end with semicolon, it doest detect the error, and doesnt add it on save)
-- Nice-to-have: Include option to load the pattern from a svg file.
+- Add help hints to explain the difference between % and px. Change the controls for UnitControl
 
 WHAT IS THIS PROJECT
 ===

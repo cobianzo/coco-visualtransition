@@ -36,7 +36,7 @@ const newCoreBlock = createHigherOrderComponent(
 			return <BlockEdit {...props} />;
 		}
 
-		// init variables for the controls
+		// init variables for the controls. tagName is a Gutenberg native attr, set in Advanded tab.
 		const { attributes, setAttributes } = props;
 		const { visualTransitionName, tagName = 'div', typePattern = '%' } = attributes;
 
