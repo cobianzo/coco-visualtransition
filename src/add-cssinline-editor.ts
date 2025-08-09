@@ -13,6 +13,8 @@ declare global {
 interface PatternAttributes {
     patternHeight?: number;
     patternWidth?: number;
+    typePattern?: string; // '%' or 'px'
+		onlyDesktop?: boolean; // true or false
     YOffset?: number;
 }
 
@@ -33,7 +35,7 @@ export async function getInlineCssSvg(patternName: string, blockId: string, atts
 					data: {
 							pattern_name: patternName,
 							block_id: blockId,
-							pattern_atts: atts //  ie. { patternHeight: 0.08, patternWidth: 0.2, YOffset: -40}
+							pattern_atts: atts //  ie. { patternHeight: 0.08, patternWidth: 0.2, YOffset: -40, typePattern: '%', onlyDesktop: false }
 					}
 			});
 

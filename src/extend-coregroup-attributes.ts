@@ -2,7 +2,7 @@ import { addFilter } from '@wordpress/hooks';
 import type { BlockConfiguration } from '@wordpress/blocks';
 
 
-// ads two new attributes to the core/group block.
+// ads  new attributes to the core/group block.
 const customAttributes = {
 	// dropdown
 	visualTransitionName: {
@@ -24,6 +24,10 @@ const customAttributes = {
 	typePattern: {
 		type: 'string',
 		default: '%', // Allowed: '%' or 'px'
+	},
+	onlyDesktop: {
+		type: 'boolean',
+		default: false,
 	},
 };
 

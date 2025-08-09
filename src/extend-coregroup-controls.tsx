@@ -24,7 +24,8 @@ interface CustomAttributes {
 	patternHeight?: number;
 	patternWidth?: number;
 	YOffset?: number;
-	typePattern?: string; // Add typePattern
+	typePattern?: string; // px or %
+	onlyDesktop?: boolean; // true or false
 }
 
 // Crear componente HOC para extender el panel de Inspector
@@ -162,6 +163,12 @@ const newCoreBlock = createHigherOrderComponent(
 										max={0}
 										step={1}
 										help={  __("Overlaps the group with the precendent group by translating it on the Y axis. This control overwrites the margin top. It allows you to assign negative value to it. Note that the margin top will change the value to fit this one in pixels", "coco-visualtransition") }
+								/>
+								<CheckboxControl
+									label={__("Only Desktop", "coco-visualtransition")}
+									checked={attributes.onlyDesktop || false}
+									onChange={(value: boolean) => setAttributes({ onlyDesktop: value })}
+									help={__("If checked, the visual transition will only apply on desktop devices.", "coco-visualtransition")}
 								/>
 							</>
 						)}

@@ -23,7 +23,8 @@ final class SVGPath_Helpers {
 
 
 	/**
-	 * Identifies format M -5.033 7.474 C 15.496 3.269 33.904 1.285 54.586 3.603  respect -0.1 0, 0.07 0, 0.07 0.16,
+	 * Identifies format M -5.033 7.474 C 15.496 3.269 33.904 1.285 54.586 3.603
+	 * respect the polygon format: -0.1 0, 0.07 0, 0.07 0.16,
 	 * If it's format with 'M', 'C' ... it transform every vertex info into an item of an array.
 	 * ie [ 'M 5 4', 'C 5.5 4.0 5.2 3.3 5.6 3.3', ... ]
 	 *
@@ -31,9 +32,10 @@ final class SVGPath_Helpers {
 	 * @return array<int, string>|false Returns array of path commands if valid trajectory, false otherwise.
 	 */
 	public static function is_trajectory_path( string $string_path ): array|false {
-		// we call trajectory path, if the points use beizer vertex, we use path d, otherwise we use polygon, for right lines.
+		// we call trajectory path, if the points use beizer vertex, we use path d,
+		// otherwise we use polygon, for right lines.
 
-		// cleanup path removing placeholders like {x_size}
+		// temporarily cleanup path removing placeholders like {x_size}
 		$valid_placeholders = [
 			1 => 'x_size',
 			2 => 'y_size',
@@ -45,6 +47,7 @@ final class SVGPath_Helpers {
 
 		$is_trajectory_path = preg_match( '/[' . self::TRAJECTORY_PATH_VALID_CHARS . ']/', $string_path );
 
+		// convertion into an array of path commands
 		if ( $is_trajectory_path ) {
 			$pattern = '/([' . preg_quote( self::TRAJECTORY_PATH_VALID_CHARS, '/' ) . '])([^' . preg_quote( self::TRAJECTORY_PATH_VALID_CHARS, '/' ) . ']*)/';
 

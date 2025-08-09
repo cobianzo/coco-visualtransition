@@ -19,6 +19,7 @@ $y_offset = is_string( $atts['y-offset'] ) || is_numeric( $atts['y-offset'] ) ? 
 	<?php
 	// [data-cocovisualtransitionid=XXX] {  css rules ... }  <<-- FOR THE FRONTEND
 	// [data-block=XXX] { css rules }  << --- FOR THE EDITOR
+	ob_start();
 	?>
 	[<?php echo esc_attr( $selector ); ?>="<?php echo esc_attr( $id ); ?>"]{
 		<?php if ( ! $is_mask ) : ?>
@@ -33,8 +34,14 @@ $y_offset = is_string( $atts['y-offset'] ) || is_numeric( $atts['y-offset'] ) ? 
 			?>
 			margin-top: <?php echo esc_html( (string) $y_offset ); ?>px;
 		<?php endif; ?>
-
 	}
+	<?php
+	$css = ob_get_clean();
+	if ( ! empty( $atts['only-desktop'] ) ) {
+		$css = "@media (min-width: 769px) { $css }";
+	}
+	echo apply_filters( 'coco_visual_transition_css', $css, $id, $atts );
+	?>
 </style>
 <?php
 // phpcs:enable
