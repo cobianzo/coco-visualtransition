@@ -344,13 +344,13 @@ final class SVGPath_Helpers {
 	 * Scales all Y coordinates in the given SVG path string so that the minimum Y becomes 0 and the maximum Y becomes 1.
 	 *
 	 * @param string $path_string The SVG path string to scale.
-	 * @param float $multiplier_factor Once the Y coords are scaled from 0 to 1, we can multiply by a factor in % per 1, i.e 0.5
+	 * @param float  $multiplier_factor Once the Y coords are scaled from 0 to 1, we can multiply by a factor in % per 1, i.e 0.5
 	 * @return string The path string with Y coordinates scaled from 0 to 1.
 	 */
 	public static function scale_y_to_unit_interval( string $path_string, float $multiplier_factor = 1.0 ): string {
 		$max_y = self::get_max_y_from_path( $path_string );
 
-		if ( $max_y == 0 ) {
+		if ( $max_y === 0 ) {
 			return $path_string;
 		}
 

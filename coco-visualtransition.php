@@ -64,20 +64,24 @@ coco_vt_init();
  * @param mixed $var Variable to dump
  * @return void
  */
-function dd( mixed $var ): void {
-	echo '<pre>';
-	var_dump( $var );
-	echo '</pre>';
+if ( ! function_exists( 'dd' ) ) {
+	function dd( mixed $var ): void {
+		echo '<pre>';
+		var_dump( $var );
+		echo '</pre>';
+	}
 }
 
 /**
  * Debug function to dump variables and die
  *
  * @param mixed $var Variable to dump
- * @return never
+ * @return void
  */
-function ddie( mixed $var = '' ): never {
-	dd( $var );
-	wp_die();
+if ( ! function_exists( 'ddie' ) ) {
+	function ddie( mixed $var = '' ): void {
+		dd( $var );
+		wp_die();
+	}
 }
 // phpcs:enable

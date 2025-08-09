@@ -241,7 +241,7 @@ class SVG_Generator {
 		$path_string = ( $is_trajectory ? 'M ' : '' ) . "$start_point_x 0";
 		$x_size      = $this->pattern_width;
 		// Determinar y_size según el tipo de patrón
-		$y_size = ($this->type_pattern === 'px') ? 1 : $this->pattern_height;
+		$y_size = ( $this->type_pattern === 'px' ) ? 1 : $this->pattern_height;
 
 		// $path_string building on every iteration.
 		// we add one set of the 'pattern' on every iteration.

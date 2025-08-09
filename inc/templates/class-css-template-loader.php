@@ -8,8 +8,10 @@
 namespace COCO\VisualTransition\Templates;
 
 class CSS_Template_Loader {
+
+
 	/**
-	 * Render CSS template for patternType '%'.
+	 * Render CSS template for typePattern '%'.
 	 *
 	 * @param string               $id
 	 * @param string               $pattern_id
@@ -25,7 +27,7 @@ class CSS_Template_Loader {
 	}
 
 	/**
-	 * Render CSS template for patternType 'px'.
+	 * Render CSS template for typePattern 'px'.
 	 *
 	 * @param string               $id
 	 * @param string               $pattern_id
