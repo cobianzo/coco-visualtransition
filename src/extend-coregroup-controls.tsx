@@ -113,18 +113,6 @@ const newCoreBlock = createHigherOrderComponent(
 								{/* Radio control for typePattern */}
 								<div style={{ marginBottom: '16px' }}>
 									<label style={{ fontWeight: 'bold', display: 'block', marginBottom: 4 }}>{__("Pattern Height Unit", "coco-visualtransition")}</label>
-									<label style={{ marginRight: 12 }}>
-										<input
-											type="radio"
-											checked={typePattern === '%'}
-											value="%"
-											onChange={() => setAttributes({
-												typePattern: '%',
-												patternHeight: 0.2
-											})}
-										/>
-										{' %'}
-									</label>
 									<label>
 										<input
 											type="radio"
@@ -135,7 +123,20 @@ const newCoreBlock = createHigherOrderComponent(
 												patternHeight: 35
 											})}
 										/>
-										{' px'}
+										{' px (prepend cropped edge)'}
+									</label>
+									<br />
+									<label style={{ marginLeft: 0 }}>
+										<input
+											type="radio"
+											checked={typePattern === '%'}
+											value="%"
+											onChange={() => setAttributes({
+												typePattern: '%',
+												patternHeight: 0.2
+											})}
+										/>
+										{' % (clip container, experimental) '}
 									</label>
 								</div>
 

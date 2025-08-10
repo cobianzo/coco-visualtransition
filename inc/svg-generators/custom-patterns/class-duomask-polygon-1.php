@@ -26,9 +26,13 @@ class DuoMask_Polygon_1 extends SVG_Generator {
 	 */
 	public function generate_svg(): string {
 
+		// helper. We'll use it later.
 		$fn_divide_by_100 = fn( float $c ): float => $c / 100.0;
+
 		// semitransparent mask path. Defined in % per cent, and transformed in % per 1.
 		$semitranslarent_path = ' L -1.06 3.591 L 13.991 0.119 L 52.265 7.816 L 74.952 1.2 L 82.687 3.075 L 102.672 1.202';
+
+		// convert in % per 1.
 		$semitranslarent_path = SVGPath_Helpers::apply_transform_to_path_coordenates(
 			$semitranslarent_path,
 			$fn_divide_by_100,

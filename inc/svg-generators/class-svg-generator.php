@@ -152,14 +152,15 @@ class SVG_Generator {
 		$this->points_string = '';
 		$this->svg_string    = '';
 
-		// the $atts params which customizes the pattern mask.
+		// the $atts params which customizes the pattern mask. Default to the same default set in src/extend-coregroup-attributes.ts
 		$this->pattern_height = ( isset( $atts['pattern-height'] ) && '' !== $atts['pattern-height'] )
-			? (float) Generic_Helpers::to_float( $atts['pattern-height'] ) : 0.0;
+			? (float) Generic_Helpers::to_float( $atts['pattern-height'] ) : 0.08;
 
 		$this->pattern_width = ( isset( $atts['pattern-width'] ) && '' !== $atts['pattern-width'] )
-			? (float) Generic_Helpers::to_float( $atts['pattern-width'] ) : 0.0;
+			? (float) Generic_Helpers::to_float( $atts['pattern-width'] ) : 0.3333;
 
-		$this->type_pattern = ( isset( $atts['type-pattern'] ) && in_array( $atts['type-pattern'], [ '%', 'px' ], true ) ) ? $atts['type-pattern'] : '';
+		$this->type_pattern = ( isset( $atts['type-pattern'] )
+			&& in_array( $atts['type-pattern'], [ '%', 'px' ], true ) ) ? $atts['type-pattern'] : 'px';
 
 
 		// these will create the $this->svg_string.

@@ -6,6 +6,9 @@
  *
  * phpcs:disable
  */
+
+if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
+
 /**
  * @var string $id Unique identifier for the transition
  * @var string $pattern_id Pattern ID for the SVG reference

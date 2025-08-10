@@ -1,6 +1,9 @@
 TODO
 ===
-[...]
+
+	- include an option to specify the mask path in patterns.json
+	- we could optimize much more the way masked clips work (class-duomask-...)
+	- in the Frotnend, try to include the css inline with wp_add_inline_style()
 
 WHAT IS THIS PROJECT
 ===

@@ -5,8 +5,10 @@
  * @package CocoVisualTransition
  */
 
+
 namespace COCO\VisualTransition\Templates;
 
+if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 class CSS_Template_Loader {
 
 
