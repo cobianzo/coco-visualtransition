@@ -41,6 +41,7 @@ final class InlineCSS_Block_Controller {
 
 	/**
 	 * Injects an attribute into the first <div> of the block content.
+	 * We use it on the html of the block, to add a class to the div.
 	 *
 	 * @param string $block_content The block content HTML.
 	 * @param string $attribute The attribute name to add.
@@ -69,6 +70,7 @@ final class InlineCSS_Block_Controller {
 			|| ! isset( $block['attrs']['visualTransitionName'] ) ) {
 			return $block_content;
 		}
+
 		// add attribute to the block (for the frontend)
 		if ( 'core/group' === $block['blockName'] && ! empty( $block['attrs']['visualTransitionName'] ) ) {
 			$random_id     = 'vt_' . wp_generate_uuid4();
@@ -81,9 +83,10 @@ final class InlineCSS_Block_Controller {
 				'pattern-height' => isset( $block['attrs']['patternHeight'] ) && is_numeric( $block['attrs']['patternHeight'] ) ? (float) $block['attrs']['patternHeight'] : 0.08,
 				'pattern-width'  => isset( $block['attrs']['patternWidth'] ) && is_numeric( $block['attrs']['patternWidth'] ) ? (float) $block['attrs']['patternWidth'] : 0.1,
 				'y-offset'       => isset( $block['attrs']['YOffset'] ) && is_numeric( $block['attrs']['YOffset'] ) ? (float) $block['attrs']['YOffset'] : 0.0,
-				'type-pattern'   => isset( $block['attrs']['typePattern'] ) && in_array( $block['attrs']['typePattern'], [ '%', 'px' ], true ) ? $block['attrs']['typePattern'] : '%',
+				'type-pattern'   => isset( $block['attrs']['typePattern'] ) && in_array( $block['attrs']['typePattern'], [ '%', 'px' ], true ) ? $block['attrs']['typePattern'] : '',
 				'only-desktop'   => ! empty( $block['attrs']['onlyDesktop'] ),
 			];
+
 			$pattern       = is_string( $block['attrs']['visualTransitionName'] )
 				? $block['attrs']['visualTransitionName']
 				: '';

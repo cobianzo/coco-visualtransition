@@ -11,33 +11,25 @@
     "value": "triangles",
     "pattern": "L 0 {y_size} L {x_size} 0 L {2*x_size} {y_size}",
     "patternRepeat": "repeat-x",
-    "scale": 100
+    "scale": 1
   },
   {
     "label": "Irregular triangles 1",
     "value": "irregular-triangles-1",
-    "pattern": "L 0 5.449 L 12.362 1.058 L 30.91 10.02 L 54.314 6.735 L 84.487 10.04 L 120 4.443",
+    "pattern": "L 0 {0.5426*y_size} L 12.362 {0.1054*y_size} L 30.91 {0.9979*y_size} L 54.314 {0.6707*y_size} L 84.487 {1.0000*y_size} L 120 {0.4424*y_size}",
     "scale": 100
   },
   {
     "label": "Slope 1",
     "value": "slope-1",
-    "pattern": "L -5.033 7.474 C 15.496 3.269 33.904 1.285 54.586 3.603 C 64.577 4.723 74.742 10.648 84.471 13.26 C 92.802 15.496 103.067 14.696 130.572 16.959",
+    "pattern": "L 0.017 {0.5409*y_size} C 0.017 {0.5409*y_size} 3.518 {0.3488*y_size} 13.756 {0.3639*y_size} C 23.994 {0.3790*y_size} 23.181 {0.7556*y_size} 32.12 {0.8774*y_size} C 41.059 {1.0000*y_size} 47.95 {0.2605*y_size} 64.972 {0.2527*y_size} C 81.994 {0.2449*y_size} 75.539 {0.7709*y_size} 90.944 {0.7852*y_size} C 106.349 {0.7996*y_size} 115.976 {0.4288*y_size} 120.333 {0.4236*y_size}",
     "scale": 100
   },
   {
     "label": "Slope 2",
     "value": "slope-2",
-    "pattern": "L 0 6.136 C 0.138 6.136 8.263 1.566 24.495 1.163 C 40.727 0.76 58.398 2.354 65.03 3.812 C 71.662 5.27 83.403 9.275 90.864 8.261 C 98.325 7.247 105.271 0.688 118.154 1.042",
-    "scale": 100,
-    "type": "mask"
-  },
-  {
-    "label": "Shark Fin Mask",
-    "value": "shark-fin",
-    "pattern": "{y_size}",
-    "scale": 100,
-    "type": "mask"
+    "pattern": "L 0.182 {0.1519*y_size} C 0.182 {0.1519*y_size} 23.841 -{0.0772*y_size} 34.901 {0.2337*y_size} C 45.961 {0.5448*y_size} 66.692 {1.0000*y_size} 98.252 {0.4281*y_size} C 129.812 -{0.1439*y_size} 117.443 {0.5974*y_size} 117.443 {0.5974*y_size}",
+    "scale": 100
   },
   {
     "label": "DuoMask Slope 1",

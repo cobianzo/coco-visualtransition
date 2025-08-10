@@ -23,7 +23,7 @@ const customAttributes = {
 	},
 	typePattern: {
 		type: 'string',
-		default: '%', // Allowed: '%' or 'px'
+		default: 'px', // Allowed: '%' or 'px'
 	},
 	onlyDesktop: {
 		type: 'boolean',

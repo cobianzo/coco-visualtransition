@@ -9,7 +9,7 @@
 
 namespace COCO\VisualTransition\Services;
 
-use Coco\VisualTransition\SVG_Generator_Factory;
+use Coco\VisualTransition\SVG_Generator;
 use COCO\VisualTransition\Templates\CSS_Template_Loader;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -31,8 +31,7 @@ final class InlineCSS_Renderer {
 	 * @return array{svg: string, css: string, pattern_id: string, is_mask: bool}
 	 */
 	public static function generate_svg_and_css( string $pattern, string $id, array $atts = [], string $selector = 'data-cocovisualtransitionid' ): array {
-		require_once plugin_dir_path( __FILE__ ) . '/../svg-generators/class-svg-generator-factory.php';
-		$generator  = SVG_Generator_Factory::create( $pattern, $id, $atts );
+		$generator  = SVG_Generator::create( $pattern, $id, $atts );
 		$svg        = $generator->svg_string;
 		$pattern_id = $generator->pattern_id;
 		$is_mask    = isset( $generator->pattern_data['type'] ) && 'mask' === $generator->pattern_data['type'];
@@ -42,6 +41,7 @@ final class InlineCSS_Renderer {
 			require_once plugin_dir_path( __FILE__ ) . '/../templates/class-css-template-loader.php';
 		}
 
+		// importantL default typePattern is 'px', so if it's empty it means it is 'px'
 		if ( '%' === $generator->type_pattern ) {
 			$css = CSS_Template_Loader::render_percent( $id, $pattern_id, $is_mask, $atts, $selector );
 		} else {

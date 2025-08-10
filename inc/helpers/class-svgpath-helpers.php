@@ -35,14 +35,16 @@ final class SVGPath_Helpers {
 		// we call trajectory path, if the points use beizer vertex, we use path d,
 		// otherwise we use polygon, for right lines.
 
-		// temporarily cleanup path removing placeholders like {x_size}
+		// temporarily cleanup path removing placeholders like {x_size}, we need to replace it for number
+		// so they are not mistaken for trajectory path commands.
 		$valid_placeholders = [
 			1 => 'x_size',
 			2 => 'y_size',
-			3 => '2*x_size',
+			3 => '*x_size',
+			4 => '*y_size',
 		];
 		foreach ( $valid_placeholders as $placeholder_id => $placeholder_name ) {
-			$string_path = str_replace( '{' . $placeholder_name . '}', '{' . $placeholder_id . '}', $string_path );
+			$string_path = str_replace( $placeholder_name, '-' . $placeholder_id . '-', $string_path );
 		}
 
 		$is_trajectory_path = preg_match( '/[' . self::TRAJECTORY_PATH_VALID_CHARS . ']/', $string_path );
@@ -71,9 +73,9 @@ final class SVGPath_Helpers {
 				$result[] = $command . ' ' . $params;
 			}
 
-			// Replace placeholders back
+			// Restore the placeholders by Replacing the value back
 			foreach ( $valid_placeholders as $placeholder_id => $placeholder_name ) {
-				$result = str_replace( '{' . $placeholder_id . '}', '{' . $placeholder_name . '}', $result );
+				$result = str_replace( '-' . $placeholder_id . '-', $placeholder_name, $result );
 			}
 
 			return $result;
@@ -103,16 +105,25 @@ final class SVGPath_Helpers {
 
 		// ======= transform function for X and Y coords (placeholder replacements and scale):
 		$fn_transform_any_coordenate = function ( string|float $coordenate ) use ( $scale, $param_values ) {
+
 			$coordenate = (string) $coordenate;
 			foreach ( $param_values as $param_name => $param_value ) {
 				$param_value_str = (string) ( $param_value * $scale );
 				$coordenate      = str_replace( "{{$param_name}}", $param_value_str, $coordenate );
-				$coordenate      = str_replace( "{2*$param_name}", (string) ( 2 * $param_value * $scale ), $coordenate );
+
+				// Match any decimal multiplier pattern like "{0.435*param_name}"
+				$pattern = '/\{(\d*\.?\d+)\*' . preg_quote( $param_name, '/' ) . '\}/';
+				if ( preg_match_all( $pattern, $coordenate, $matches ) ) {
+					foreach ( $matches[1] as $multiplier ) {
+						$value      = (float) $multiplier * $param_value * $scale;
+						$coordenate = str_replace( "{{$multiplier}*{$param_name}}", (string) $value, $coordenate );
+					}
+				}
 			}
 			$coordenate_float = (float) $coordenate / $scale;
 			return (string) $coordenate_float;
 		};
-		// ======= transform function only for X coords:
+		// ======= transform function only for X coords (incremn base_x_coord):
 		$fn_transform_x_coordenate = function ( string|float $coordenate ) use ( $base_x_coord, $fn_transform_any_coordenate ) {
 			$coordenate       = $fn_transform_any_coordenate( $coordenate );
 			$coordenate_float = (float) $coordenate + $base_x_coord;
@@ -344,7 +355,8 @@ final class SVGPath_Helpers {
 	}
 
 	/**
-	 * Scales all Y coordinates in the given SVG path string so that the minimum Y becomes 0 and the maximum Y becomes 1.
+	 * Scales all Y coordinates in the given SVG path string so that the minimum Y becomes 0
+	 * and the maximum Y becomes 1.
 	 *
 	 * @param string $path_string The SVG path string to scale.
 	 * @param float  $multiplier_factor Once the Y coords are scaled from 0 to 1, we can multiply by a factor in % per 1, i.e 0.5

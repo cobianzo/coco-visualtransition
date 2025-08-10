@@ -13,18 +13,50 @@ use Coco\VisualTransition\Helpers\Generic_Helpers;
 use Coco\VisualTransition\Helpers\SVGPath_Helpers;
 
 /**
- * The parent class that initializes the generic stuff,
- * and the child classes will extend it.
+ * Class that generates SVG patterns for visual transitions.
  *
- * It creates the <svg> <defs> <clipPath... ... for the mask that will clip the core/>block div,
- * it will be applied by using css rules
+ * Creates the <svg> <defs> <clipPath... elements for the mask that will clip the core/block div,
+ * which will be applied using CSS rules.
  *
- * Important: svg_string ( and points_string ) is whan determines the shape of the svg, that's what matters.
- *
- * We never call this class directly (we call the children classes for evert pattern shape)
- * We call  `SVG _ Generator _ Factory :: create`
+ * Important: svg_string (and points_string) determines the shape of the svg.
+ * Custom patterns can extend this class to provide their own svg_string and points_string implementations.
  */
 class SVG_Generator {
+
+	/**
+	 * Creates a new SVG generator instance based on the pattern type
+	 *
+	 * @param string              $pattern The pattern type to generate.
+	 * @param string              $id      The unique identifier for the SVG.
+	 * @param array<string,mixed> $atts Optional attributes for the SVG generator.
+	 * @throws \InvalidArgumentException If pattern or id is empty or invalid.
+	 * @return SVG_Generator Instance of the requested SVG generator.
+	 */
+	public static function create( string $pattern, string $id, array $atts = [] ): SVG_Generator {
+		// Validate pattern and id before processing
+		if ( empty( trim( $pattern ) ) || empty( trim( $id ) ) ) {
+			throw new \InvalidArgumentException( 'Pattern and ID cannot be empty or contain only whitespace.' );
+		}
+
+		$file_path = plugin_dir_path( __FILE__ ) . "custom-patterns/class-$pattern.php";
+		if ( file_exists( $file_path ) ) {
+            // phpcs:ignore WordPressVIPMinimum.Files.IncludingFile.UsingVariable
+			require_once $file_path;
+		}
+
+		// call to the constructor.
+		switch ( $pattern ) {
+			case 'duomask-slope-1':
+				return new DuoMask_Slope_1( $pattern, $id, $atts );
+			case 'duomask-polygon-1':
+				return new DuoMask_Polygon_1( $pattern, $id, $atts );
+			case 'shark-fin':
+				return new Shark_Fin( $pattern, $id, $atts );
+			default:
+				// Generic
+				return new self( $pattern, $id, $atts );
+		}
+	}
 
 	/**
 	 * Unique identifier for the SVG element
@@ -127,7 +159,7 @@ class SVG_Generator {
 		$this->pattern_width = ( isset( $atts['pattern-width'] ) && '' !== $atts['pattern-width'] )
 			? (float) Generic_Helpers::to_float( $atts['pattern-width'] ) : 0.0;
 
-		$this->type_pattern = ( isset( $atts['type-pattern'] ) && in_array( $atts['type-pattern'], [ '%', 'px' ], true ) ) ? $atts['type-pattern'] : '%';
+		$this->type_pattern = ( isset( $atts['type-pattern'] ) && in_array( $atts['type-pattern'], [ '%', 'px' ], true ) ) ? $atts['type-pattern'] : '';
 
 
 		// these will create the $this->svg_string.
@@ -160,7 +192,7 @@ class SVG_Generator {
 	}
 
 	/**
-	 * Generates an SVG based on the provided parameters
+	 * Generates an SVG (the whole tag, <svg ... > ) )based on the provided parameters
 	 *
 	 * @return string The generated SVG markup
 	 */
@@ -169,6 +201,7 @@ class SVG_Generator {
 
 		$extra_attrs = [
 			'style' => 'position:absolute;overflow:hidden;',
+			// add more tags here if you want to
 		];
 
 		$is_trajectory_path = SVGPath_Helpers::is_trajectory_path( $points );
@@ -179,6 +212,7 @@ class SVG_Generator {
 			fn( string $carry, string $attr ) => $carry . ' ' . sprintf( '%s="%s"', $attr, esc_attr( $extra_attrs[ $attr ] ) ),
 			''
 		);
+
 
 		/**
 		 * IMPORTANT:

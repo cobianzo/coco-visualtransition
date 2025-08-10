@@ -1,12 +1,6 @@
 TODO
 ===
-
-- Make it work with group sections (problems so far, so i've restricted to make it work only with <div>)- Add z-index 1 and see if it works.
-- Add option to change height in mobile or disable the visual transition in mobile at least
-- add e2e tests and more phpunit tests.
-- create option to validate the plugin with my server, so we can create the pro version of the plugin.
-- Eslint doesnt apply prettier formatting (ie, if a line doesnt end with semicolon, it doest detect the error, and doesnt add it on save)
-- Add help hints to explain the difference between % and px. Change the controls for UnitControl
+[...]
 
 WHAT IS THIS PROJECT
 ===
@@ -22,16 +16,22 @@ HOW IT WORKS
 2) Depending on the selected pattern, includes inline css for every group having a pattern selected.
 3) The inline css includes a svg with an id, which is associated to the core/group as a mask with clip-path or mark-image.
 4) We use an SVG generator in php, which dyanmicaly generates a svg with the pattern, and includes it in the page.
-We use the development pattern 'factory' for it.
+
+The `SVG_Generator` class can be extended to create custom patterns.with group sections (problems so far, so i've restricted to make it work only with <div>)- Add z-index 1 and see if it works.
+- Add option to change height in mobile or disable the visual transition in mobile at least
+- add e2e tests and more phpunit tests.
+- create option to validate the plugin with my server, so we can create the pro version of the plugin.
+- Eslint doesnt apply prettier formatting (ie, if a line doesnt end with semicolon, it doest detect the error, and doesnt add it on save)
+- Add help hints to explain the difference between % and px. Change the controls for UnitControl
+
 
 DETAILS
 ===
 All visual transitions, or shapes, must be defined in `patterns.json`.
-They must be included in the `inc/svg-generators/class-svg-generator-factory.php`,and the child class must be created.
 There are different ways to define a visual transition:
-- with the field 'pattern' of `pattern.json`, which defines the svg path points of the sape
-- overwriting the method generate_svg, in the php class of the svg pattern. ie inc/svg-generators/class-waves-svg.php
-- overwriting the method generate_points, "  ".
+- Using the field 'pattern' in `patterns.json`, which defines the SVG path points of the shape
+- Creating a custom class that extends `SVG_Generator` and overrides the `generate_svg` method
+- Creating a custom class that extends `SVG_Generator` and overrides the `generate_points` method
 
 TO ADD NEW PATTERNS
 ===
@@ -40,21 +40,29 @@ TO ADD NEW PATTERNS
 - Create an horizontal line, from 0 to 100 in the x axis.
 - Copy and paste the shape in your VSCode editor.
 - Retrieve the value inside of d="". The fist vertex must be an 'L', not an 'M', and start by 0 for the x.
-- Better if the right edge x arrives to 120, so it compensate that the mask has negative x boundaries.
+- Better if the right edge x arrives to 120, so it compensates that the mask has negative x boundaries.
 - Copy the path points into the key 'pattern' in `patterns.json`.
 - Set the key 'scale' to 100.
 - If you want, you can use the placeholders {x_size} and {y_size}, and even{2*x_size} in the pattern.
 
-## TO ADD A MORE CUSTOMIZED NEW PATTERN (several masks with transparencias)
+This is the prompt for the LLM to scale the y axis with the param
+> "My program designs patterns using SVG. Here I have the SVG path code I designed. But I want to program it so that the height of the SVG line can be scaled.
+> Therefore, I want to insert a variable called {y_size} that corresponds to the maximum height mentioned in the entire path, and I want the Y-axis values to be expressed as a percentage of that {y_size}, for example {0.56*y_size}.
+> So:
+> 1) Identify the Y coordinates values
+> 2) Extract the highest value of these coordinates, which will correspond to {y_size}
+> 3) Rewrite the path, and for each Y coordinate, replace it with its value relative to {y_size}"
 
-- For more control on the pattern, you can create your own SVG with more complex mask paths, including more than one.
-- See the example of the duomask-slope-1.
-- In this case the SVG is created totally in the PHP, so we can add more than one path.
+
+## TO ADD A MORE CUSTOMIZED NEW PATTERN (several masks with transparencies)
+
+- For more control on the pattern, you can create your own SVG with complex mask paths, including more than one.
+- See the example of the duomask-polygon-1.
+- In this case the SVG is created entirely in PHP, so you can add more than one path.
 - Create a new key in `patterns.json`, and set the key 'type' to 'custom'.
-- Create a new class in inc/svg-generators/custom-patterns/
-- Reference this new class in `inc/svg-generators/class-svg-generator-factory.php`.
-- Overwrite the method generate_svg, and return the svg code.
-- follow inc/svg-generators/custom-patterns/class-duomask-slope-1.php as an example.
+- Create a new class in inc/svg-generators/custom-patterns/ that extends `SVG_Generator`
+- Override the `generate_svg` method in your class to return the custom SVG code.
+- Follow inc/svg-generators/custom-patterns/class-duomask-polygon-1.php as an example.
 
 DEVELOPMENT
 ===

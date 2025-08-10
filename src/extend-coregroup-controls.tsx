@@ -118,7 +118,10 @@ const newCoreBlock = createHigherOrderComponent(
 											type="radio"
 											checked={typePattern === '%'}
 											value="%"
-											onChange={() => setAttributes({ typePattern: '%' })}
+											onChange={() => setAttributes({
+												typePattern: '%',
+												patternHeight: 0.2
+											})}
 										/>
 										{' %'}
 									</label>
@@ -127,7 +130,10 @@ const newCoreBlock = createHigherOrderComponent(
 											type="radio"
 											checked={typePattern === 'px'}
 											value="px"
-											onChange={() => setAttributes({ typePattern: 'px' })}
+											onChange={() => setAttributes({
+												typePattern: 'px',
+												patternHeight: 35
+											})}
 										/>
 										{' px'}
 									</label>

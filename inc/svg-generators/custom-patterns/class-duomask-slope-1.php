@@ -37,9 +37,7 @@ class DuoMask_Slope_1 extends SVG_Generator {
 		. ' C 0.54577 ' . $this->pattern_height * ( 0.04723 ) . ' 0.64742 ' . $this->pattern_height * ( 0.10648 ) . ' 0.74471 ' . $this->pattern_height * ( 0.1326 )
 		. ' C 0.82802 ' . $this->pattern_height * ( 0.15496 ) . ' 0.93067 ' . $this->pattern_height * ( 0.14696 ) . ' 1.20572 ' . $this->pattern_height * 1;
 
-
 		$semitranslarent_path = SVGPath_Helpers::close_path( $semitranslarent_path );
-
 
 		$this->svg_string = '<svg width="0" height="0" style="position:absolute;overflow:hidden;">
 	<defs>
