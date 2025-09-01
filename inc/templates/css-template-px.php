@@ -1,6 +1,6 @@
 <?php
 /**
- * CSS Template for Visual Transition (typePattern 'px')
+ * CSS Template for Visual Transition (typePattern 'px'). Editor and Frontend
  *
  * @package CocoVisualTransition
  *
@@ -18,7 +18,9 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
  */
 $y_offset = is_string( $atts['y-offset'] ) || is_numeric( $atts['y-offset'] ) ? (float) $atts['y-offset'] : 0;
 ?>
-<style id="coco-vt-<?php echo esc_attr( $id ); ?>" class="coco-vt--style-px">
+<style id="coco-vt-<?php echo esc_attr( $id ); ?>" class="coco-vt--style-px" <?php
+	echo defined('WP_DEBUG') && WP_DEBUG ? 'style="display: block; color: darkred; font-size: 14px;" contenteditable="true"' : '';
+	?>>
 	<?php ob_start(); ?>
 		[<?php echo esc_attr( $selector ); ?>="<?php echo esc_attr( $id ); ?>"]{
 
@@ -35,6 +37,13 @@ $y_offset = is_string( $atts['y-offset'] ) || is_numeric( $atts['y-offset'] ) ? 
 				left: 0;
 				top: 0;
 				background: inherit;
+				background-position: inherit;
+				background-repeat: inherit;
+				background-size: inherit;
+				background-attachment: inherit;
+				background-origin: inherit;
+				background-clip: inherit;
+				background-blend-mode: inherit;
 				position: absolute;
 				translate: 0 -100%;
 

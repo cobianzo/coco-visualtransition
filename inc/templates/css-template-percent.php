@@ -1,6 +1,6 @@
 <?php
 /**
- * CSS Template for Visual Transition (typePattern '%')
+ * CSS Template for Visual Transition (typePattern '%'). Editor and Frontend
  *
  * @package CocoVisualTransition
  *
@@ -18,10 +18,11 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
  */
 $y_offset = is_string( $atts['y-offset'] ) || is_numeric( $atts['y-offset'] ) ? (float) $atts['y-offset'] : 0;
 ?>
-<style id="coco-vt-<?php echo esc_attr( $id ); ?>" class="coco-vt--style-percent">
+<style id="coco-vt-<?php echo esc_attr( $id ); ?>" class="coco-vt--style-percent" <?php
+	echo defined('WP_DEBUG') && WP_DEBUG ? 'style="display: block; color: blue; font-size: 14px;" contenteditable="true"' : '';
+	?>>
 	<?php
-	// [data-cocovisualtransitionid=XXX] {  css rules ... }  <<-- FOR THE FRONTEND
-	// [data-block=XXX] { css rules }  << --- FOR THE EDITOR
+	// [data-cocovisualtransitionid=XXX] {  css rules ... }  <<-- FOR THE FRONTEND AND EDITOR
 	ob_start();
 	?>
 	[<?php echo esc_attr( $selector ); ?>="<?php echo esc_attr( $id ); ?>"]{

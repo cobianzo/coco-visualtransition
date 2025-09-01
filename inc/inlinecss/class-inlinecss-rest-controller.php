@@ -105,7 +105,7 @@ final class InlineCSS_REST_Controller {
 		];
 		$svg_and_style = InlineCSS_Cache::get( $pattern_name, $block_id, $atts );
 		if ( null === $svg_and_style ) {
-			$rendered      = InlineCSS_Renderer::generate_svg_and_css( $pattern_name, $block_id, $atts, 'data-block' );
+			$rendered      = InlineCSS_Renderer::generate_svg_and_css( $pattern_name, $block_id, $atts, 'data-cocovisualtransitionid' );
 			$svg_and_style = $rendered['svg'] . $rendered['css'];
 			InlineCSS_Cache::set( $pattern_name, $block_id, $atts, $svg_and_style );
 		}

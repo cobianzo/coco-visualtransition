@@ -1,6 +1,7 @@
 <?php
 /**
  * InlineCSS Block Controller using wp_add_inline_style
+ * Frontend only.
  *
  * This version uses WordPress's wp_add_inline_style function to add CSS to the document head
  * instead of injecting it inline with the content. This provides better separation of concerns
@@ -32,7 +33,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Controller for handling the render_block filter for visual transition using wp_add_inline_style.
  */
 final class InlineCSS_Block_Controller {
-	
+
 	/**
 	 * Whether the base style has been enqueued.
 	 *
@@ -58,11 +59,11 @@ final class InlineCSS_Block_Controller {
 		if ( self::$base_style_enqueued ) {
 			return;
 		}
-		
+
 		// Register and enqueue a base handle for our inline styles
 		wp_register_style( 'coco-visual-transition', false );
 		wp_enqueue_style( 'coco-visual-transition' );
-		
+
 		self::$base_style_enqueued = true;
 	}
 
@@ -74,11 +75,11 @@ final class InlineCSS_Block_Controller {
 	 */
 	private static function add_inline_style( string $css ): void {
 		self::ensure_base_style();
-		
+
 		// Remove <style> tags if present and get clean CSS
 		$clean_css = preg_replace( '/<style[^>]*>(.*?)<\/style>/s', '$1', $css );
 		$clean_css = trim( $clean_css );
-		
+
 		if ( ! empty( $clean_css ) ) {
 			wp_add_inline_style( 'coco-visual-transition', $clean_css );
 		}
@@ -150,7 +151,7 @@ final class InlineCSS_Block_Controller {
 				'data-cocovisualtransitionid',
 				$random_id
 			);
-			
+
 			$atts = [
 				'pattern-height' => isset( $block['attrs']['patternHeight'] ) && is_numeric( $block['attrs']['patternHeight'] ) ? (float) $block['attrs']['patternHeight'] : 0.08,
 				'pattern-width'  => isset( $block['attrs']['patternWidth'] ) && is_numeric( $block['attrs']['patternWidth'] ) ? (float) $block['attrs']['patternWidth'] : 0.1,
@@ -183,7 +184,7 @@ final class InlineCSS_Block_Controller {
 			// Add only SVG to block content
 			$block_content .= $svg_content;
 		}
-		
+
 		return $block_content;
 	}
 }
